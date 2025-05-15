@@ -29,9 +29,22 @@
 		0BEA107B2DD305880026F746 /* RedBeanUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RedBeanUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		0B200AAA2DD5AB750054454F /* Exceptions for "RedBean" folder in "RedBean" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 0BEA105F2DD305870026F746 /* RedBean */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		0BEA10622DD305870026F746 /* RedBean */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				0B200AAA2DD5AB750054454F /* Exceptions for "RedBean" folder in "RedBean" target */,
+			);
 			path = RedBean;
 			sourceTree = "<group>";
 		};
@@ -394,6 +407,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"RedBean/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = RedBean/Info.plist;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -431,6 +445,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"RedBean/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = RedBean/Info.plist;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;

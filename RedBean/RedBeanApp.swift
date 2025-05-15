@@ -14,4 +14,6 @@ struct RedBeanApp: App {
             ContentView()
         }
     }
+    
 }
+
