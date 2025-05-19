@@ -1,0 +1,17 @@
+//
+//  AppScreen.swift
+//  RedBean
+//
+//  Created by Angel on 5/18/25.
+//
+
+import SwiftUI
+
+enum AppScreen {
+    case loading
+    case home
+    //case call
+    case login
+    //case shred
+    //case settings
+}
