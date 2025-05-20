@@ -6,6 +6,9 @@
 //
 
 import SwiftUI
+import FirebaseCore
+import FirebaseFirestore
+import FirebaseAuth
 
 @main
 struct RedBeanApp: App {
@@ -14,6 +17,8 @@ struct RedBeanApp: App {
             ContentView()
         }
     }
-    
+    init() {
+        FirebaseApp.configure()
+    }
 }
 

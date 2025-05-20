@@ -10,8 +10,8 @@ import SwiftUI
 enum AppScreen {
     case loading
     case home
-    //case call
     case login
-    //case shred
-    //case settings
+//    case shred
+//    case settings
+//    case call
 }

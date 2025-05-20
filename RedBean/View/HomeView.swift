@@ -7,9 +7,9 @@
 
 import SwiftUI
 
-struct MainView: View {
+struct HomeView: View {
     @Binding var currentScreen: AppScreen
-    @StateObject private var viewModel = MainViewModel()
+    @StateObject private var viewModel = HomeViewModel()
     var body: some View {
         ZStack() {
             Rectangle()
@@ -51,5 +51,5 @@ struct MainView: View {
 }
 
 #Preview {
-    MainAppView(currentScreen: <#Binding<AppScreen>#>)
+    HomeView(currentScreen: .constant(.home))
 }

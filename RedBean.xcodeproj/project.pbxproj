@@ -6,6 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		0B8037782DDA94F300DF9593 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 0B8037772DDA94F300DF9593 /* FirebaseAuth */; };
+		0B80377A2DDA94F300DF9593 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 0B8037792DDA94F300DF9593 /* FirebaseFirestore */; };
+		0B8037812DDAEA0900DF9593 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 0B8037802DDAEA0900DF9593 /* GoogleSignInSwift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		0BEA10722DD305880026F746 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -33,17 +39,29 @@
 		0B200AAA2DD5AB750054454F /* Exceptions for "RedBean" folder in "RedBean" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				.gitignore,
 				Info.plist,
 			);
 			target = 0BEA105F2DD305870026F746 /* RedBean */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
+/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+		0B8037882DDC3E4D00DF9593 /* Exceptions for "RedBean" folder in "Compile Sources" phase from "RedBean" target */ = {
+			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
+			buildPhase = 0BEA105C2DD305870026F746 /* Sources */;
+			membershipExceptions = (
+				.gitignore,
+			);
+		};
+/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		0BEA10622DD305870026F746 /* RedBean */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				0B200AAA2DD5AB750054454F /* Exceptions for "RedBean" folder in "RedBean" target */,
+				0B8037882DDC3E4D00DF9593 /* Exceptions for "RedBean" folder in "Compile Sources" phase from "RedBean" target */,
 			);
 			path = RedBean;
 			sourceTree = "<group>";
@@ -65,6 +83,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0B8037812DDAEA0900DF9593 /* GoogleSignInSwift in Frameworks */,
+				0B8037782DDA94F300DF9593 /* FirebaseAuth in Frameworks */,
+				0B80377A2DDA94F300DF9593 /* FirebaseFirestore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -125,6 +146,9 @@
 			);
 			name = RedBean;
 			packageProductDependencies = (
+				0B8037772DDA94F300DF9593 /* FirebaseAuth */,
+				0B8037792DDA94F300DF9593 /* FirebaseFirestore */,
+				0B8037802DDAEA0900DF9593 /* GoogleSignInSwift */,
 			);
 			productName = RedBean;
 			productReference = 0BEA10602DD305870026F746 /* RedBean.app */;
@@ -208,6 +232,10 @@
 			);
 			mainGroup = 0BEA10572DD305870026F746;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				0B8037762DDA94F300DF9593 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				0B80377F2DDAEA0900DF9593 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 0BEA10612DD305870026F746 /* Products */;
 			projectDirPath = "";
@@ -428,6 +456,7 @@
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_MODULES_AUTOLINK = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				XROS_DEPLOYMENT_TARGET = 2.1;
@@ -466,6 +495,7 @@
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_MODULES_AUTOLINK = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				XROS_DEPLOYMENT_TARGET = 2.1;
@@ -598,6 +628,43 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		0B8037762DDA94F300DF9593 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.12.0;
+			};
+		};
+		0B80377F2DDAEA0900DF9593 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		0B8037772DDA94F300DF9593 /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0B8037762DDA94F300DF9593 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		0B8037792DDA94F300DF9593 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0B8037762DDA94F300DF9593 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+		0B8037802DDAEA0900DF9593 /* GoogleSignInSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0B80377F2DDAEA0900DF9593 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignInSwift;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 0BEA10582DD305870026F746 /* Project object */;
 }

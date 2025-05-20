@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct LoadAppView: View {
+struct LoadView: View {
     var body: some View {
         ZStack() {
             Text("RedBean")
@@ -31,5 +31,5 @@ struct LoadAppView: View {
 }
 
 #Preview {
-    LoadAppView()
+    LoadView()
 }

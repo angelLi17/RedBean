@@ -6,3 +6,13 @@
 //
 
 import SwiftUI
+import Foundation
+import Combine
+
+class HomeViewModel: ObservableObject {
+    @Published var username: String = ""
+    @Published var password: String = ""
+    @Published var errorMessage: String?
+
+    
+}
