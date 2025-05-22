@@ -14,6 +14,9 @@ struct LoginView: View {
     @Binding var currentScreen: AppScreen
     @State var email: String = ""
     @State var password: String = ""
+    @State private var showLoginAlert = false
+    @State private var showSignupAlert = false
+    @State private var errorMessage = ""
     
     var body: some View {
         ZStack() {
@@ -64,6 +67,13 @@ struct LoginView: View {
                 color: Color(red: 0, green: 0, blue: 0, opacity: 0.30), radius: 2, y: 4
             )
             .offset(x: -84, y: 166)
+            .alert("Sign In Error", isPresented: $showLoginAlert) {
+                Button("OK", role: .cancel) {
+                    showLoginAlert = false
+                }
+            } message: {
+                Text(errorMessage)
+            }
             
             Button(action: {viewModel.register(email: email, password: password)}) {
                 Text("Sign Up")
@@ -77,8 +87,16 @@ struct LoginView: View {
                 color: Color(red: 0, green: 0, blue: 0, opacity: 0.30), radius: 2, y: 4
             )
             .offset(x: 82, y: 166)
+            .alert("Sign Up Error", isPresented: $showSignupAlert) {
+                Button("OK", role: .cancel) {
+                    showSignupAlert = false
+                }
+            } message: {
+                Text(errorMessage)
+            }
             
-            // note to self - start working tomorrow on the alert for login errors in LoginViewModel and adjusting the Button formatting. then try to add like database for contact list? do reset pw and confirm email later
+            // do reset pw and confirm email later
+            
         }
         .frame(width: 390, height: 844)
         .background(.white)

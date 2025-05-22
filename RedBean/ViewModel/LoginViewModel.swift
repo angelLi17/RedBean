@@ -12,27 +12,27 @@ import FirebaseCore
 import FirebaseAuth
 
 class LoginViewModel: ObservableObject {
-    @State var showLoginAlert = false
+    @State private var showLoginAlert = false
+    @State private var showSignupAlert = false
+    @State private var errorMessage = ""
 
     func signIn(email: String, password: String) {
-        let result: () = Auth.auth().signIn(withEmail: email, password: password) { result, error in
+        Auth.auth().signIn(withEmail: email, password: password) { result, error in
             if error != nil {
-                print (error!.localizedDescription)
+                self.showLoginAlert = true
+                self.errorMessage = error!.localizedDescription
             }
         }
         
     }
     
     func register(email: String, password: String) {
-        var showalert = false
-        Auth.auth().createUser(withEmail: email, password: password) { [self] result, error in
+        Auth.auth().createUser(withEmail: email, password: password) { result, error in
             if (error != nil) {
-                showLoginAlert = true
+                self.showSignupAlert = true
+                self.errorMessage = error!.localizedDescription
             }
-            AlertScene("Sign Up Error", isPresented: $showLoginAlert) {
-            } message: {
-                Text(error!.localizedDescription)
-            }
+            
         }
         
     }
