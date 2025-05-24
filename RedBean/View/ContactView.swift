@@ -12,21 +12,21 @@ struct ContactView: View {
 
     var body: some View {
         NavigationView {
-        
-                List {
-                    Section(header: Text("Schedules")) {
-                        ForEach(viewModel.schedules) { schedule in
-                            Text(schedule.title)
-                        }
-                    }
-                    Section(header: Text("Contacts")) {
-                        ForEach(viewModel.contacts) { contact in
-                            Text(contact.name)
-                        }
-                    }
-                }
-                .navigationTitle("Home")
-            }
+                //        
+                //                List {
+                //                    Section(header: Text("Schedules")) {
+                //                        ForEach(viewModel.schedules) { schedule in
+                //                            Text(schedule.title)
+                //                        }
+                //                    }
+                //                    Section(header: Text("Contacts")) {
+                //                        ForEach(viewModel.contacts) { contact in
+                //                            Text(contact.name)
+                //                        }
+                //                    }
+                //                }
+                //                .navigationTitle("Home")
+                //            }
         }
     }
 }

@@ -24,15 +24,15 @@ class ContactsViewModel: ObservableObject {
     
     
     func fetchContacts() {
-        db.collection("users").document(userId).collection("contacts")
-            .getDocuments { snapshot, error in
-                if let error = error {
-                    self.errorMessage = error.localizedDescription
-                    return
-                }
-                self.contacts = snapshot?.documents.compactMap { doc in
-                    try? doc.data(as: Contact.self)
-                } ?? []
-            }
+//        db.collection("users").document(userId).collection("contacts")
+//            .getDocuments { snapshot, error in
+//                if let error = error {
+//                    self.errorMessage = error.localizedDescription
+//                    return
+//                }
+//                self.contacts = snapshot?.documents.compactMap { doc in
+//                    try? doc.data(as: Contact.self)
+//                } ?? []
+//            }
     }
 }

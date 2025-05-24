@@ -10,12 +10,18 @@ import FirebaseCore
 import FirebaseAuth
 
 struct LoginView: View {
-    @StateObject private var viewModel = LoginViewModel()
+    @StateObject private var viewModel: LoginViewModel
     @State private var email: String = ""
     @State private var password: String = ""
     @State private var showLoginAlert = false
     @State private var showSignupAlert = false
     @State private var errorMessage = ""
+    @Binding var currentScreen: AppScreen
+    @Binding var userID: String
+    
+    init(userID: String) {
+        _viewModel = StateObject(wrappedValue: LoginViewModel(userID: userID))
+    }
     
     var body: some View {
         ZStack() {
@@ -95,6 +101,7 @@ struct LoginView: View {
             }
             // do reset pw and confirm email later
             
+            
         }
         .frame(width: 390, height: 844)
         .background(.white)
@@ -102,5 +109,5 @@ struct LoginView: View {
 }
 
 #Preview {
-    LoginView()
+    LoginView(userID: "")
 }

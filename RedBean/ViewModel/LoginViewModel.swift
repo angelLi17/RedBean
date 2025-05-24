@@ -16,6 +16,11 @@ class LoginViewModel: ObservableObject {
     @State private var showSignupAlert = false
     @State private var errorMessage = ""
     @State private var userID = ""
+    @Binding var currentScreen: AppScreen
+    
+    init(userID: String) {
+        self.userID = userID
+    }
 
     func signIn(email: String, password: String) {
         Auth.auth().signIn(withEmail: email, password: password) { result, error in

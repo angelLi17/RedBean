@@ -8,12 +8,12 @@
 import SwiftUI
 
 struct HomeView: View {
-    @Binding var currentScreen: AppScreen
-    @StateObject private var viewModel = HomeViewModel(userId: <#String#>)
-    @State private var userID: String
+    @StateObject var viewModel: HomeViewModel
+    @State private var userID: String = ""
     
     init(userID: String) {
         self.userID = userID
+        _viewModel = StateObject(wrappedValue: HomeViewModel(userID: userID))
     }
     
     var body: some View {

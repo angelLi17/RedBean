@@ -15,9 +15,9 @@ class HomeViewModel: ObservableObject {
     @Published var password: String = ""
     @Published var errorMessage: String?
     private let db = Firestore.firestore()
-    private let userId: String
-
-    init(userId: String) {
-        self.userId = userId
+    @State private var userID: String = ""
+        
+    init(userID: String) {
+        self.userID = userID
     }
 }

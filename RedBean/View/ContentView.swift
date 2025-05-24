@@ -20,14 +20,16 @@ struct ContentView: View {
                             currentScreen = .login
                         }
                     }
-            case .login: {
-                LoginView()
-                if (userID != "") {
-                    currentScreen = .home
-                }
-            }
+            case .login:
+                LoginView(userID: userID)
+                .onChange(of: userID) { oldValue, newValue in
+                        if newValue != "" {
+                            currentScreen = .home
+                        }
+                    }
             case .home:
                 HomeView(userID: userID)
+            
         
 //        case .call:
 //            <#code#>CallView()
