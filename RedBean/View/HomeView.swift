@@ -9,7 +9,13 @@ import SwiftUI
 
 struct HomeView: View {
     @Binding var currentScreen: AppScreen
-    @StateObject private var viewModel = HomeViewModel()
+    @StateObject private var viewModel = HomeViewModel(userId: <#String#>)
+    @State private var userID: String
+    
+    init(userID: String) {
+        self.userID = userID
+    }
+    
     var body: some View {
         ZStack() {
             Rectangle()
@@ -51,5 +57,6 @@ struct HomeView: View {
 }
 
 #Preview {
-    HomeView(currentScreen: .constant(.home))
+    HomeView(userID: "angel")
 }
+

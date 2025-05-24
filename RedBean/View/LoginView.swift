@@ -11,9 +11,8 @@ import FirebaseAuth
 
 struct LoginView: View {
     @StateObject private var viewModel = LoginViewModel()
-    @Binding var currentScreen: AppScreen
-    @State var email: String = ""
-    @State var password: String = ""
+    @State private var email: String = ""
+    @State private var password: String = ""
     @State private var showLoginAlert = false
     @State private var showSignupAlert = false
     @State private var errorMessage = ""
@@ -94,7 +93,6 @@ struct LoginView: View {
             } message: {
                 Text(errorMessage)
             }
-            
             // do reset pw and confirm email later
             
         }
@@ -104,6 +102,5 @@ struct LoginView: View {
 }
 
 #Preview {
-    LoginView(currentScreen: .constant(.login))
+    LoginView()
 }
-

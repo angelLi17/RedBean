@@ -15,6 +15,7 @@ class LoginViewModel: ObservableObject {
     @State private var showLoginAlert = false
     @State private var showSignupAlert = false
     @State private var errorMessage = ""
+    @State private var userID = ""
 
     func signIn(email: String, password: String) {
         Auth.auth().signIn(withEmail: email, password: password) { result, error in
@@ -23,17 +24,20 @@ class LoginViewModel: ObservableObject {
                 self.errorMessage = error!.localizedDescription
             }
         }
-        
+        if let user = Auth.auth().currentUser {
+            let userId = user.uid
+        }
     }
     
     func register(email: String, password: String) {
-        Auth.auth().createUser(withEmail: email, password: password) { result, error in
+         Auth.auth().createUser(withEmail: email, password: password) { result, error in
             if (error != nil) {
                 self.showSignupAlert = true
                 self.errorMessage = error!.localizedDescription
             }
-            
         }
-        
+        if let user = Auth.auth().currentUser {
+            let userId = user.uid
+        }
     }
 }
