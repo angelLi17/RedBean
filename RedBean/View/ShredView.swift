@@ -9,23 +9,21 @@ import FirebaseCore
 import FirebaseAuth
 
 struct ShredView: View {
-    @StateObject private var viewModel = LoginViewModel()
-    @Binding var currentScreen: AppScreen
-    @State var username: String = ""
-    @State var password: String = ""
-    
+//    @StateObject private var viewModel = LoginViewModel()
+//    @Binding var currentScreen: AppScreen
+//    @State var username: String = ""
+//    @State var password: String = ""
+//    
     var body: some View {
         ZStack() {
-            Form {
-                TextField(text: $username, prompt: Text("vent here...then shred it up, take a walk and keep at it. nothing you type here will be seen by anyone else. You've got this!")) {
-                    Text("Username")
-                        .font(.custom("Biryani", size: 20))
-                        .foregroundColor(Color("aRed"))
-                        .offset(x: -112, y: -81)
-                }
-            }
+//            Form {
+//                TextField(text: $username, prompt: Text("vent here...then shred it up, take a walk and keep at it. nothing you type here will be seen by anyone else. You've got this!")) {
+//                    Text("Username")
+//                        .font(.custom("Biryani", size: 20))
+//                        .foregroundColor(Color("aRed"))
+//                        .offset(x: -112, y: -81)
+//                }
+//            }
         }
-        
-        
     }
 }

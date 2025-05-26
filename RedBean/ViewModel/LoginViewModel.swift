@@ -15,12 +15,7 @@ class LoginViewModel: ObservableObject {
     @State private var showLoginAlert = false
     @State private var showSignupAlert = false
     @State private var errorMessage = ""
-    @State private var userID = ""
-    @Binding var currentScreen: AppScreen
-    
-    init(userID: String) {
-        self.userID = userID
-    }
+    @Published var userID: String = ""
 
     func signIn(email: String, password: String) {
         Auth.auth().signIn(withEmail: email, password: password) { result, error in
@@ -30,7 +25,7 @@ class LoginViewModel: ObservableObject {
             }
         }
         if let user = Auth.auth().currentUser {
-            let userId = user.uid
+            userID = user.uid
         }
     }
     
@@ -42,7 +37,7 @@ class LoginViewModel: ObservableObject {
             }
         }
         if let user = Auth.auth().currentUser {
-            let userId = user.uid
+            userID = user.uid
         }
     }
 }

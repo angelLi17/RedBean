@@ -8,13 +8,7 @@
 import SwiftUI
 
 struct HomeView: View {
-    @StateObject var viewModel: HomeViewModel
-    @State private var userID: String = ""
-    
-    init(userID: String) {
-        self.userID = userID
-        _viewModel = StateObject(wrappedValue: HomeViewModel(userID: userID))
-    }
+    @ObservedObject var homeModel: HomeViewModel
     
     var body: some View {
         ZStack() {
