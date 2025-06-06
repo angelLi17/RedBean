@@ -51,6 +51,6 @@ struct HomeView: View {
 }
 
 #Preview {
-    HomeView(userID: "angel")
+    HomeView(homeModel: HomeViewModel())
 }
 

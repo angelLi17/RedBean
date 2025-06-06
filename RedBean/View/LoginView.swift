@@ -12,9 +12,6 @@ import FirebaseAuth
 struct LoginView: View {
     @State private var email: String = ""
     @State private var password: String = ""
-    @State private var showLoginAlert = false
-    @State private var showSignupAlert = false
-    @State private var errorMessage = ""
     @ObservedObject var viewModel: LoginViewModel
     
     var body: some View {
@@ -66,12 +63,12 @@ struct LoginView: View {
                 color: Color(red: 0, green: 0, blue: 0, opacity: 0.30), radius: 2, y: 4
             )
             .offset(x: -84, y: 166)
-            .alert("Sign In Error", isPresented: $showLoginAlert) {
+            .alert("Sign In Error", isPresented: $viewModel.showLoginAlert) {
                 Button("OK", role: .cancel) {
-                    showLoginAlert = false
+                    viewModel.showLoginAlert = false
                 }
             } message: {
-                Text(errorMessage)
+                Text(viewModel.errorMessage)
             }
             
             Button(action: {viewModel.register(email: email, password: password)}) {
@@ -86,12 +83,12 @@ struct LoginView: View {
                 color: Color(red: 0, green: 0, blue: 0, opacity: 0.30), radius: 2, y: 4
             )
             .offset(x: 82, y: 166)
-            .alert("Sign Up Error", isPresented: $showSignupAlert) {
+            .alert("Sign Up Error", isPresented: $viewModel.showSignupAlert) {
                 Button("OK", role: .cancel) {
-                    showSignupAlert = false
+                    viewModel.showSignupAlert = false
                 }
             } message: {
-                Text(errorMessage)
+                Text(viewModel.errorMessage)
             }
             // do reset pw and confirm email later
         }
@@ -101,5 +98,5 @@ struct LoginView: View {
 }
 
 #Preview {
-    LoginView()
+    LoginView(viewModel: LoginViewModel())
 }

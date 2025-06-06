@@ -9,8 +9,8 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var currentScreen: AppScreen = .loading
-    @StateObject private var viewModel = LoginViewModel()
-    @StateObject private var homeModel: HomeViewModel
+    @StateObject var viewModel = LoginViewModel()
+    @StateObject var homeModel = HomeViewModel()
 
     var body: some View {
         switch currentScreen {
@@ -22,15 +22,15 @@ struct ContentView: View {
                         }
                     }
             case .login:
-                LoginView(viewModel: LoginViewModel)
+                LoginView(viewModel: LoginViewModel())
                 .onChange(of: viewModel.userID) { oldValue, newValue in
                         if newValue != "" {
                             currentScreen = .home
-                            _homeModel = StateObject( HomeViewModel(userID: viewModel.userID))
+                            homeModel.userID = viewModel.userID
                         }
                     }
             case .home:
-                HomeView(homeModel: HomeViewModel)
+                HomeView(homeModel: HomeViewModel())
             
         
 //        case .call:

@@ -12,9 +12,9 @@ import FirebaseCore
 import FirebaseAuth
 
 class LoginViewModel: ObservableObject {
-    @State private var showLoginAlert = false
-    @State private var showSignupAlert = false
-    @State private var errorMessage = ""
+    @Published var showLoginAlert: Bool = false
+    @Published var showSignupAlert: Bool = false
+    @Published var errorMessage: String = ""
     @Published var userID: String = ""
 
     func signIn(email: String, password: String) {
