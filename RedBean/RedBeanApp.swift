@@ -7,8 +7,8 @@
 
 import SwiftUI
 import FirebaseCore
-import FirebaseFirestore
 import FirebaseAuth
+import Contacts
 
 @main
 struct RedBeanApp: App {
@@ -20,5 +20,7 @@ struct RedBeanApp: App {
     init() {
         FirebaseApp.configure()
     }
+    
 }
+
 

@@ -11,8 +11,9 @@ import Combine
 import FirebaseFirestore
 
 class HomeViewModel: ObservableObject {
-    @Published var errorMessage: String?
-    private let db = Firestore.firestore()
+    @Published var errorMessage: String? // WHAT DOES ? MEAN
     @Published var userID: String = ""
+    @Published var nextScreen: AppScreen = .home
         
+    //functions for when click this button switch screens
 }

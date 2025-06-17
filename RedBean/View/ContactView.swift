@@ -8,25 +8,24 @@
 import SwiftUI
 
 struct ContactView: View {
-    @StateObject var viewModel: HomeViewModel
-
+    @ObservedObject var homeModel: HomeViewModel
+    @ObservedObject private var contactModel = ContactViewModel()
+    
     var body: some View {
-        NavigationView {
-                //        
-                //                List {
-                //                    Section(header: Text("Schedules")) {
-                //                        ForEach(viewModel.schedules) { schedule in
-                //                            Text(schedule.title)
-                //                        }
-                //                    }
-                //                    Section(header: Text("Contacts")) {
-                //                        ForEach(viewModel.contacts) { contact in
-                //                            Text(contact.name)
-                //                        }
-                //                    }
-                //                }
-                //                .navigationTitle("Home")
-                //            }
+        ZStack {
+            Button("Request Contacts Access") {
+                contactModel.requestAccess()
+            }
+            List {
+                Section(header: Text("Contacts")) {
+//                    ForEach(contactModel.contacts) { contact in
+//                        Text(contact.name)
+//                        Circle(contact.pfp)
+//                    }
+                }
+            }
+            .navigationTitle("Home")
         }
     }
+    
 }

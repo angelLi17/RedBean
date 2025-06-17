@@ -9,8 +9,7 @@ import FirebaseCore
 import FirebaseAuth
 
 struct ShredView: View {
-//    @StateObject private var viewModel = LoginViewModel()
-//    @Binding var currentScreen: AppScreen
+    @ObservedObject var homeModel: HomeViewModel
 //    @State var username: String = ""
 //    @State var password: String = ""
 //    
