@@ -11,7 +11,7 @@ struct LoadView: View {
     var body: some View {
         ZStack() {
             Text("RedBean")
-                .font(.custom("BM Jua", size: 75))
+                .font(.custom("Jua", size: 75)) //or is it BM Jua..fontspace name is BM??
                 .foregroundColor(.white)
                 .offset(x: -0.50, y: 155)
             Rectangle()

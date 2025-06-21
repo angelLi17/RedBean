@@ -33,36 +33,42 @@ struct LoginView: View {
                 .font(.custom("Biryani", size: 20))
                 .foregroundColor(Color("aRed"))
                 .offset(x: -113, y: 20.50)
-            Rectangle()
+            Rectangle() //future dont  need this, use .frame on TextField
                 .fill(Color("aPink"))
                 .frame(width: 322, height: 66)
                 .offset(x: 0, y: 63)
             VStack {
-                TextField("",text: $email, prompt: Text("redbeansoup@gmail.com"))
+                TextField("",text: $email, prompt: Text("soup at redbean dot com")) //this turns blue when i use actual @ symbol how do i fix that
                     .font(Font.custom("Biryani", size: 20))
-                    .foregroundColor(Color("aRed"))
+                    .foregroundStyle(Color("aRed"))
                     .offset(x: 0, y: -2)
-                    .frame(width: 322, height: 66)
+                    .frame(width: 302, height: 66)
                 SecureField("",text: $password, prompt: Text("********"))
                     .font(.custom("Biryani", size: 20))
-                    .foregroundColor(Color("aRed"))
+                    .foregroundStyle(Color("aRed"))
                     .offset(x: 0, y: 25)
-                    .frame(width: 322, height: 66)
+                    .frame(width: 302, height: 66)
             }
             .disableAutocorrection(true)
 
             Button(action: {viewModel.signIn(email: email, password: password)}) {
-                Text("Login")
-                    .font(.custom("Biryani", size: 25))
-                    .foregroundColor(Color("aPink"))
+                
+                ZStack {
+                    Color("aRed")
+                        .cornerRadius(90)
+                        .shadow(color: Color(red: 0, green: 0, blue: 0, opacity: 0.30), radius: 2, y: 4)
+                    Text("LOGIN")
+                        .font(.custom("Biryani", size: 25))
+                        .foregroundColor(Color("aPink"))
+                }
+                .frame(width: 150, height: 66)
             }
             .background(Color("aRed"))
             .cornerRadius(90)
-            .frame(width: 154, height: 66)
             .shadow(
                 color: Color(red: 0, green: 0, blue: 0, opacity: 0.30), radius: 2, y: 4
             )
-            .offset(x: -84, y: 166)
+            .offset(x: -86, y: 166)
             .alert("Sign In Error", isPresented: $viewModel.showLoginAlert) {
                 Button("OK", role: .cancel) {
                     viewModel.showLoginAlert = false
@@ -71,25 +77,25 @@ struct LoginView: View {
                 Text(viewModel.errorMessage)
             }
             
-            Button(action: {viewModel.register(email: email, password: password)}) {
-                Text("Sign Up")
-                    .font(.custom("Biryani", size: 25))
-                    .foregroundColor(Color("aRed"))
+            Button(action: { viewModel.register(email: email, password: password) }) {
+                ZStack {
+                    Color("aPink")
+                        .cornerRadius(90)
+                        .shadow(color: Color(red: 0, green: 0, blue: 0, opacity: 0.30), radius: 2, y: 4)
+                    Text("SIGN UP")
+                        .font(.custom("Biryani", size: 25))
+                        .foregroundColor(Color("aRed"))
+                }
+                .frame(width: 159, height: 66)
             }
-            .background(Color("aPink"))
-            .cornerRadius(90)
-            .frame(width: 159, height: 66)
-            .shadow(
-                color: Color(red: 0, green: 0, blue: 0, opacity: 0.30), radius: 2, y: 4
-            )
             .offset(x: 82, y: 166)
             .alert("Sign Up Error", isPresented: $viewModel.showSignupAlert) {
-                Button("OK", role: .cancel) {
-                    viewModel.showSignupAlert = false
+                    Button("OK", role: .cancel) {
+                        viewModel.showSignupAlert = false
+                    }
+                } message: {
+                    Text(viewModel.errorMessage)
                 }
-            } message: {
-                Text(viewModel.errorMessage)
-            }
             // do reset pw and confirm email later
         }
         .frame(width: 390, height: 844)

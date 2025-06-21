@@ -12,6 +12,7 @@ enum AppScreen {
     case home
     case login
     case contact
+    case displayName
 //    case schedule
 //    case shred
 //    case settings

@@ -11,7 +11,7 @@ struct ContentView: View {
     @State private var currentScreen: AppScreen = .loading
     @StateObject var viewModel = LoginViewModel()
     @StateObject var homeModel = HomeViewModel()
-    @StateObject private var contactModel = ContactViewModel()
+    @StateObject var contactModel = ContactViewModel()
 
     var body: some View {
         switch currentScreen {
@@ -23,22 +23,36 @@ struct ContentView: View {
                         }
                     }
             case .login:
-                LoginView(viewModel: LoginViewModel())
-                .onChange(of: viewModel.userID) { oldValue, newValue in
+                LoginView(viewModel: viewModel)
+                    .onChange(of: viewModel.userID) { oldValue, newValue in
                         if newValue != "" {
+                            if viewModel.displayName.isEmpty {
+                                currentScreen = .displayName
+                            } else {
+                                currentScreen = .home
+                                homeModel.userID = viewModel.userID
+                                homeModel.displayName = viewModel.displayName
+                            }
+                        }
+                    }
+            case .displayName:
+                DisplayNameView(viewModel: viewModel)
+                    .onChange(of: viewModel.displayName) { oldValue, newValue in
+                        if !newValue.isEmpty {
                             currentScreen = .home
                             homeModel.userID = viewModel.userID
+                            homeModel.displayName = viewModel.displayName
                         }
                     }
             case .home:
-                HomeView(homeModel: HomeViewModel())
-                .onChange(of: homeModel.nextScreen) { oldValue, newValue in
-                    if newValue != .home {
+                HomeView(homeModel: homeModel)
+                    .onChange(of: homeModel.nextScreen) { oldValue, newValue in
+                        if newValue != .home {
                             currentScreen = homeModel.nextScreen
                         }
                     }
             case .contact:
-                ContactView(homeModel: HomeViewModel())
+                ContactView(homeModel: homeModel, contactModel: contactModel)
             
 //        case .call:
 //            <#code#>CallView()
