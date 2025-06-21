@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ScheduleView: View {
     @ObservedObject var homeModel: HomeViewModel
-    @ObservedObject private var schedModel = SchedViewModel() //no custom saved sched option for now
+    //no custom saved sched option for now
     
     var body: some View {
         ZStack {

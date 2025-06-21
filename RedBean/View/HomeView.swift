@@ -8,6 +8,14 @@
 import SwiftUI
 
 struct HomeView: View {
+    @State var menu1Clicked: Bool = false
+    @State var menu2Clicked: Bool = false
+    @State var menu3Clicked: Bool = false
+    
+    @State var set1Clicked: Bool = false
+    @State var set2Clicked: Bool = false
+    @State var set3Clicked: Bool = false
+    
     @ObservedObject var homeModel: HomeViewModel
     
     var body: some View {
@@ -36,7 +44,16 @@ struct HomeView: View {
             VStack(alignment: .leading, spacing: 25) {
                 Text("✰start a new bean")
                     .font(Font.custom("Biryani", size: 30))
-                    .foregroundColor(Color(red: 0.84, green: 0.37, blue: 0.37))
+                    .onHover { isHovered in
+                        if isHovered {
+                            menu1Clicked = true
+                        }
+                    }
+                    .foregroundColor(menu1Clicked ? Color(.gray).opacity(0.3) : Color(.white))
+                    .underline()
+                    .onTapGesture {
+                        //redirect to contact view
+                    }
                 Text("✰bean shredder")
                     .font(Font.custom("Biryani", size: 30))
                     .foregroundColor(Color(red: 0.84, green: 0.37, blue: 0.37))

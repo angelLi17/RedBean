@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ContactView: View {
     @ObservedObject var homeModel: HomeViewModel
-    @ObservedObject var contactModel: ContactViewModel
+    @ObservedObject var contactModel : ContactViewModel
     
     var body: some View {
         ZStack {
