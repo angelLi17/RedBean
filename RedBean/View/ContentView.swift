@@ -3,7 +3,7 @@
 //  RedBean—video app
 //
 //  Created by Angel on 5/12/25.
-// 
+//
 
 import SwiftUI
 
@@ -49,6 +49,13 @@ struct ContentView: View {
                     .onChange(of: homeModel.nextScreen) { oldValue, newValue in
                         if newValue != .home {
                             currentScreen = homeModel.nextScreen
+                            homeModel.menu1Clicked = false
+                            homeModel.menu2Clicked = false
+                            homeModel.menu3Clicked = false
+                            homeModel.set1Clicked = false
+                            homeModel.set2Clicked = false
+                            homeModel.set3Clicked = false
+                            homeModel.showSettingsMenu = false
                         }
                     }
             case .contact:

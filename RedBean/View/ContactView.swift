@@ -27,5 +27,4 @@ struct ContactView: View {
             .navigationTitle("Home")
         }
     }
-    
 }

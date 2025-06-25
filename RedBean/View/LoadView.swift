@@ -14,12 +14,20 @@ struct LoadView: View {
                 .font(.custom("Jua", size: 75)) //or is it BM Jua..fontspace name is BM??
                 .foregroundColor(.white)
                 .offset(x: -0.50, y: 155)
-            Rectangle()
+            // Rectangle()
+            //     .foregroundColor(.clear)
+            //     .frame(width: 308, height: 308)
+            //     .background(.white)
+            //     .cornerRadius(50)
+            //     .offset(x: 0, y: -67)
+            Image("Logo2")
                 .foregroundColor(.clear)
+                .scaledToFill()
                 .frame(width: 308, height: 308)
                 .background(.white)
                 .cornerRadius(50)
                 .offset(x: 0, y: -67)
+
         }
         .frame(width: 390, height: 844)
         .background(Color("aRed"))
