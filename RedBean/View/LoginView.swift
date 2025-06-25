@@ -26,17 +26,27 @@ struct LoginView: View {
                 .foregroundColor(Color("aRed"))
                 .offset(x: -134, y: -81)
             Rectangle()
+                .fill(Color("aRed"))
+                .frame(width: 322, height: 66)
+                .offset(x: 0, y: -38)
+            Rectangle()
                 .fill(Color("aPink"))
                 .frame(width: 322, height: 66)
                 .offset(x: 0, y: -38)
+                .padding(8)
             Text("Password")
                 .font(.custom("Biryani", size: 20))
                 .foregroundColor(Color("aRed"))
                 .offset(x: -113, y: 20.50)
             Rectangle() //future dont  need this, use .frame on TextField
+                .fill(Color("aRed"))
+                .frame(width: 322, height: 66)
+                .offset(x: 0, y: 63)
+            Rectangle() //future dont  need this, use .frame on TextField
                 .fill(Color("aPink"))
                 .frame(width: 322, height: 66)
                 .offset(x: 0, y: 63)
+                .padding(8)
             VStack {
                 TextField("",text: $email, prompt: Text("soup at redbean dot com")) //this turns blue when i use actual @ symbol how do i fix that
                     .font(Font.custom("Biryani", size: 20))
@@ -79,9 +89,13 @@ struct LoginView: View {
             
             Button(action: { viewModel.register(email: email, password: password) }) {
                 ZStack {
+                    Color("aRed")
+                        .cornerRadius(90)
+                        .shadow(color: Color(red: 0, green: 0, blue: 0, opacity: 0.30), radius: 2, y: 4)
                     Color("aPink")
                         .cornerRadius(90)
                         .shadow(color: Color(red: 0, green: 0, blue: 0, opacity: 0.30), radius: 2, y: 4)
+                        .padding(8)
                     Text("SIGN UP")
                         .font(.custom("Biryani", size: 25))
                         .foregroundColor(Color("aRed"))
