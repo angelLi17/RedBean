@@ -17,6 +17,7 @@ class ContactViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var contacts: [CNContact] = []
     @Published var accessGranted = false
+    @Published var nextScreen: AppScreen = .contact
 
     func requestAccess() {
         requestContactsAccess { granted in

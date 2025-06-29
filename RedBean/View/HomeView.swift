@@ -10,17 +10,20 @@ struct HomeView: View {
     
     var body: some View {
         ZStack() {
-            Color("aRed")
-                .ignoresSafeArea()
-
-
+            GeometryReader { geometry in
+                Image("Bg")
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: geometry.size.width, height: geometry.size.height)
+            }
 //settings menu
             Color("aRed")
-                .frame(width: 427, height: 67)
+                .frame(width: 427, height: 50)
                 .shadow(
                     color: Color(red: 0, green: 0, blue: 0, opacity: 0.30), radius: 2, y: 4
                 )
-                .offset(x: 96, y: -370)
+                .opacity(0.7)
+                .offset(y: -370)
 
             Color("aPink")
                 .cornerRadius(20)
@@ -52,10 +55,10 @@ struct HomeView: View {
                         homeModel.showSettingsMenu.toggle()
                     }
                 }
-                .offset(x: 105, y: -370)
+                .offset(x: 158, y: -370)
             if homeModel.showSettingsMenu {
-                VStack(spacing: 25) {
-                    Button(action: { //all buttons grey only where text idk how to fix
+            VStack(alignment: .leading, spacing: 15) {
+                    Button(action: { //all buttons grey only where text idk how to fix also they r still grey after stop clicking think its fixed but gotta change the view to fix it
                         homeModel.set1Toggle()
                     }) {
                         Text("✰profile")
@@ -64,8 +67,7 @@ struct HomeView: View {
                             .background(homeModel.set1Clicked ? Color(.gray).opacity(0.3) : Color.clear)
                             .underline(homeModel.set1Clicked ? true : false)
                     }
-                    .frame(width: 160, alignment: .leading)
-                    .padding(8)
+                    .padding(16)
                     Button(action: {
                         homeModel.set2Toggle()
                     }) {
@@ -75,8 +77,7 @@ struct HomeView: View {
                             .background(homeModel.set2Clicked ? Color(.gray).opacity(0.3) : Color.clear)
                             .underline(homeModel.set2Clicked ? true : false)
                     }
-                    .frame(width: 160, alignment: .leading)
-                    .padding(8)
+                    .padding(16)
                     Button(action: {
                         homeModel.set3Toggle()
                     }) {
@@ -86,16 +87,21 @@ struct HomeView: View {
                             .background(homeModel.set3Clicked ? Color(.gray).opacity(0.3) : Color.clear)
                             .underline(homeModel.set3Clicked ? true : false)
                     }
-                    .frame(width: 160, alignment: .leading)
-                    .padding(8)
+                    .padding(16)
                 }
-                .background(
-                    Color.white
+                .background {
+                    Color("aPink")
                         .cornerRadius(16)
-                        .padding(.horizontal, 8)
-                )
-                .frame(width: 160, height: 130)
-                .offset(x: 96, y: -246)
+                        .shadow(
+                            color: Color(red: 0, green: 0, blue: 0, opacity: 0.5), radius: 4, y: 4
+                        )
+                    Color.white
+                        .cornerRadius(10)
+                        .padding(5)
+                }
+                .frame(width: 160, height: 100)
+                .offset(x: 102, y: -206)
+
             }
 
 //welcome text
@@ -104,16 +110,16 @@ struct HomeView: View {
                 .frame(width: 200, height: 40, alignment: .trailing)
                 .offset(x: 35, y: -370)
                 .foregroundColor(Color(.white))
-            Text("Love,\nRedBean.")
-                .font(Font.custom("Inspiration", size: 80))
-                .foregroundColor(.white)
-                .offset(x: -50, y: 0)
+//            Text("Love,\nRedBean.")
+//                .font(Font.custom("Inspiration", size: 80))
+//                .foregroundColor(.white)
+//                .offset(x: -50, y: 0)
 
 //menu
             Color("aPink")
                 .cornerRadius(20)
                 .shadow(
-                    color: Color(red: 0, green: 0, blue: 0, opacity: 0.30), radius: 2, y: 4
+                    color: Color(red: 0, green: 0, blue: 0, opacity: 0.7), radius: 4, y: 4
                 )
                 .overlay(
                     Text("serving our special menu:")

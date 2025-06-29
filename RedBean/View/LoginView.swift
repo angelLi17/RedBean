@@ -17,13 +17,13 @@ struct LoginView: View {
     var body: some View {
         ZStack() {
             GeometryReader { geometry in
-            Image("loginBg") // Replace with your image asset name
-                .resizable()
-                .scaledToFill()
-                .frame(width: geometry.size.width, height: geometry.size.height)
-                .clipped()
+                Image("loginBg")
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: geometry.size.width, height: geometry.size.height)
+                    .clipped()
             }
-        .edgesIgnoringSafeArea(.all)
+            .edgesIgnoringSafeArea(.all)
             Text("Welcome, fellow Bean! \nSign in to your account")
                 .font(.custom("Biryani", size: 25))
                 .foregroundColor(Color("aRed"))
@@ -34,16 +34,24 @@ struct LoginView: View {
                 .foregroundColor(Color("aRed"))
                 .offset(x: -134, y: -81)
             Rectangle()
-                .fill(Color("aPink"))
+                .fill(Color("aRed"))
                 .frame(width: 322, height: 66)
+                .offset(x: 0, y: -38)
+            Rectangle()
+                .fill(Color("aPink"))
+                .frame(width: 318, height: 62)
                 .offset(x: 0, y: -38)
             Text("Password")
                 .font(.custom("Biryani", size: 20))
                 .foregroundColor(Color("aRed"))
                 .offset(x: -113, y: 20.50)
-            Rectangle() //future dont  need this, use .frame on TextField
-                .fill(Color("aPink"))
+            Rectangle() //bad syntax here, learn to use .background
+                .fill(Color("aRed"))
                 .frame(width: 322, height: 66)
+                .offset(x: 0, y: 63)
+            Rectangle()
+                .fill(Color("aPink"))
+                .frame(width: 318, height: 62)
                 .offset(x: 0, y: 63)
             VStack {
                 TextField("",text: $email, prompt: Text("soup at redbean dot com")) //this turns blue when i use actual @ symbol how do i fix that
@@ -90,6 +98,7 @@ struct LoginView: View {
                     Color("aPink")
                         .cornerRadius(90)
                         .shadow(color: Color(red: 0, green: 0, blue: 0, opacity: 0.30), radius: 2, y: 4)
+                        .padding(2)
                     Text("SIGN UP")
                         .font(.custom("Biryani", size: 25))
                         .foregroundColor(Color("aRed"))
@@ -104,10 +113,14 @@ struct LoginView: View {
                 } message: {
                     Text(viewModel.errorMessage)
                 }
+                .background{
+                    Color("aRed")
+                        .cornerRadius(90)
+                        .shadow(color: Color(red: 0, green: 0, blue: 0, opacity: 0.30), radius: 2, y: 4)
+                        .offset(x: 82, y: 166)
+                }
             // do reset pw and confirm email later
         }
-        .frame(width: 390, height: 844)
-        .background(.white)
     }
 }
 
