@@ -1,4 +1,4 @@
-(red bean studying logo)[./RedBean/Assets.xcassets/Logo2.imageset/New Project.png]
+![red bean studying logo](RedBean/Assets.xcassets/Logo2.imageset/New Project.png)
 # RedBean
 Video call platform for studying and productivity!
 
