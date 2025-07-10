@@ -2,6 +2,7 @@
 # RedBean
 Two-person video calling platform for studying and productivity! Built-in schedules, timers, and checklists while calling, with photobooth feature as an incentive.
 >Learning is not attained by chance, it must be sought for with ardor and attended to with diligence. — Abigail Adams
+
 Why I made this project? I tried to think of an idea that would give me an introduction to app development but was also relatively challenging for me and novel, it also addresses my own lack of motivation to study 😹 I find studying with my friends so much more motivating and productive and wanted to create a consolidated platform that incorporates my method of studying (pomodoro/timer system) and virtually calling my friends.
 
 ### How to use :))
