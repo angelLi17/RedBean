@@ -30,3 +30,6 @@ Key: No emoji = not working on, ⭐ Star emoji = claimed and working on, ✔️ 
 
 ### Buy me a coffee!
 🚧 WIP 🚧
+
+### Hackatime Note
+This project is under 3 time thingies on Hackatime: RedBean, <<LAST PROJECT>> and firebase-ios-sdk
