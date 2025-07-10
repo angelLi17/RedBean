@@ -17,8 +17,26 @@ class ContactViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var contacts: [CNContact] = []
     @Published var accessGranted = false
-    @Published var nextScreen: AppScreen = .contact
+    @Published var nextScreen: AppScreen = .contact //not connected to homeview's screen variable
 
+//     func fetchContacts() {
+//         let store = CNContactStore()
+//         store.requestAccess(for: .contacts) { granted, error in
+//             guard granted else { return }
+//             let keys = [CNContactGivenNameKey, CNContactFamilyNameKey, CNContactPhoneNumbersKey]
+//             let request = CNContactFetchRequest(keysToFetch: keys as [CNKeyDescriptor])
+//             var tempContacts: [CNContact] = []
+//             try? store.enumerateContacts(with: request) { contact, _ in
+//                 if !contact.phoneNumbers.isEmpty {
+//                     tempContacts.append(contact)
+//                 }
+//             }
+//             DispatchQueue.main.async {
+//                 self.contacts = tempContacts
+//             }
+//         }
+//     }
+    
     func requestAccess() {
         requestContactsAccess { granted in
             DispatchQueue.main.async {

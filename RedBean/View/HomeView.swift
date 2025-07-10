@@ -136,6 +136,7 @@ struct HomeView: View {
                     Text("✰start a new bean")
                         .font(Font.custom("Biryani", size: 30))
                         .foregroundColor(Color(red: 0.84, green: 0.37, blue: 0.37))
+                        .contentShape(Rectangle())
                         .background(homeModel.menu1Clicked ? Color(.gray).opacity(0.3) : Color.clear)
                         .underline(homeModel.menu1Clicked ? true : false)
                 }
@@ -144,6 +145,7 @@ struct HomeView: View {
                     homeModel.menu2Toggle()
                 }) {
                     Text("✰bean shredder")
+                        .contentShape(Rectangle())
                         .font(Font.custom("Biryani", size: 30))
                         .foregroundColor(Color(red: 0.84, green: 0.37, blue: 0.37))
                         .background(homeModel.menu2Clicked ? Color(.gray).opacity(0.3) : Color.clear)
@@ -154,6 +156,7 @@ struct HomeView: View {
                     homeModel.menu3Toggle()
                 }) {
                     Text("✰photobooth")
+                        .contentShape(Rectangle())
                         .font(Font.custom("Biryani", size: 30))
                         .foregroundColor(Color(red: 0.84, green: 0.37, blue: 0.37))
                         .background(homeModel.menu3Clicked ? Color(.gray).opacity(0.3) : Color.clear)
