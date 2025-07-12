@@ -13,8 +13,6 @@ struct ContactView: View {
     let screenWidth = UIScreen.main.bounds.width
     let screenHeight = UIScreen.main.bounds.height
     
-    @State private var selectedContactID: String? = nil
-    
     var body: some View {
 
         ZStack {
@@ -57,8 +55,11 @@ struct ContactView: View {
                 .resizable()
                 .scaledToFill()
                 .frame(width: 40, height: 40)
+                .onTapGesture {
+                    contactModel.nextScreen = .home
+                }
         }
-        .frame(width: 427, height: 50)
+        .frame(width: screenWidth, height: screenHeight/20)
         .opacity(0.9)
         .background{
             Color("aPink")
@@ -68,7 +69,7 @@ struct ContactView: View {
         }
     }
     
-    var contactView: some View {
+    var contactView: some View { //future=add scroll list for custom schedules adding
         ZStack {
             Color("aPink")
                 .cornerRadius(20)
@@ -90,19 +91,23 @@ struct ContactView: View {
                     .padding(.vertical, 8)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .background(
-                        selectedContactID == contact.identifier
+                        contactModel.selectedContactID == contact.identifier
                         ? Color.gray.opacity(0.3)
                         : Color.clear
                     )
                     .contentShape(Rectangle()) // Makes the whole row tappable
                     .onTapGesture {
-                        selectedContactID = contact.identifier
+                        contactModel.selectedContactID = contact.identifier
                         // Do something else on tap if needed
                 }
             }
             .cornerRadius(10)
             .padding(screenWidth/10/2)
             .padding(.top, screenWidth/10/3)
+            .font(.custom("Biryani", size: 15))
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .listStyle(.plain)
+            .foregroundColor(Color("aRed"))
         }
         .frame(width: 9*screenWidth/11, height: screenHeight/5)
     }
@@ -118,30 +123,51 @@ struct ContactView: View {
                 .cornerRadius(10)
                 .padding(screenWidth/10/3)
                 .padding(.top, screenWidth/10/2)
-            Text("choose a friend to call")
+            Text("choose a work:break schedule")
                 .font(.custom("Biryani", size: 20))
                 .padding(.bottom, 6*screenHeight/40)
                 .foregroundColor(Color("aRed"))
             
-            List(contactModel.contacts, id: \.identifier) { contact in
-                Text("\(contact.givenName) \(contact.familyName)")
-                    .font(.headline)
-                    .padding(.vertical, 8)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+            List {
+                Text("Classic Pomo-dango—25:5")
                     .background(
-                        selectedContactID == contact.identifier
+                        contactModel.selectedSchedule==1
                         ? Color.gray.opacity(0.3)
                         : Color.clear
                     )
-                    .contentShape(Rectangle()) // Makes the whole row tappable
                     .onTapGesture {
-                        selectedContactID = contact.identifier
+                        contactModel.selectedSchedule=1
                         // Do something else on tap if needed
-                }
+                    }
+                Text("Balanced Daifuku—20:10")
+                    .background(
+                        contactModel.selectedSchedule==2
+                        ? Color.gray.opacity(0.3)
+                        : Color.clear
+                    )
+                    .onTapGesture {
+                        contactModel.selectedSchedule=2
+                        // Do something else on tap if needed
+                    }
+                Text("Academic Injeolmi—50:10")
+                    .background(
+                        contactModel.selectedSchedule==3
+                        ? Color.gray.opacity(0.3)
+                        : Color.clear
+                    )
+                    .onTapGesture {
+                        contactModel.selectedSchedule=3
+                        // Do something else on tap if needed
+                    }
             }
             .cornerRadius(10)
             .padding(screenWidth/10/2)
             .padding(.top, screenWidth/10/3)
+            .font(.custom("Biryani", size: 15))
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .listStyle(.plain)
+            .foregroundColor(Color("aRed"))
+            .contentShape(Rectangle())
         }
         .frame(width: 9*screenWidth/11, height: screenHeight/5)
     }
@@ -157,47 +183,56 @@ struct ContactView: View {
                 .cornerRadius(10)
                 .padding(screenWidth/10/3)
                 .padding(.top, screenWidth/10/2)
-            Text("choose a friend to call")
+            Text("choose a photobooth theme")
                 .font(.custom("Biryani", size: 20))
                 .padding(.bottom, 6*screenHeight/40)
                 .foregroundColor(Color("aRed"))
             
-            List(contactModel.contacts, id: \.identifier) { contact in
-                Text("\(contact.givenName) \(contact.familyName)")
-                    .font(.headline)
-                    .padding(.vertical, 8)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+            List {
+                Text("Mr. Diligent Red Bean")
                     .background(
-                        selectedContactID == contact.identifier
+                        contactModel.selectedPhoto==1
                         ? Color.gray.opacity(0.3)
                         : Color.clear
                     )
-                    .contentShape(Rectangle()) // Makes the whole row tappable
                     .onTapGesture {
-                        selectedContactID = contact.identifier
+                        contactModel.selectedPhoto=1
                         // Do something else on tap if needed
-                }
+                    }
+                //coming soon: Mrs. Classy Vanilla Bean, Sleepy Mung Bean Baby, Ms. Capricious Chickpea, Sir Benign Black Bean
             }
             .cornerRadius(10)
             .padding(screenWidth/10/2)
             .padding(.top, screenWidth/10/3)
+            .font(.custom("Biryani", size: 15))
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .listStyle(.plain)
+            .foregroundColor(Color("aRed"))
+            .contentShape(Rectangle())
         }
         .frame(width: 9*screenWidth/11, height: screenHeight/5)
     }
     
     var footerView: some View {
-        HStack(spacing:15) {
+        HStack(spacing:screenWidth/22) {
             Rectangle()
-                .frame(width:65, height:42)
+                .frame(width:screenWidth/7, height:screenHeight/22)
                 .foregroundColor(Color("aPink"))
                 .cornerRadius(10)
             Text("START")
                 .foregroundColor(Color.white)
                 .font(.custom("Biryani", size: 20))
-                .frame(width:171, height:42)
-                .background(Color("aRed"))
+                .frame(width:3*screenWidth/7, height:screenHeight/22)
+                .background{
+                    (contactModel.selectedContactID != nil && contactModel.selectedSchedule != nil && contactModel.selectedPhoto != nil) ? Color("aRed") : Color.gray.opacity(0.3)
+                }
+                .onTapGesture {
+                    if (contactModel.selectedContactID != nil && contactModel.selectedSchedule != nil && contactModel.selectedPhoto != nil) {
+                        contactModel.nextScreen = .call
+                    }
+                }
             Rectangle()
-                .frame(width:65, height:42)
+                .frame(width:screenWidth/7, height:screenHeight/22)
                 .foregroundColor(Color("aPink"))
                 .cornerRadius(10)
         }

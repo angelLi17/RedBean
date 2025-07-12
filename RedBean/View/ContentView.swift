@@ -12,6 +12,7 @@ struct ContentView: View {
     @StateObject var viewModel = LoginViewModel()
     @StateObject var homeModel = HomeViewModel()
     @StateObject var contactModel = ContactViewModel()
+    @StateObject var callModel = CallViewModel()
 
     var body: some View {
         switch currentScreen {
@@ -60,8 +61,11 @@ struct ContentView: View {
                     }
             case .contact:
                 ContactView(homeModel: homeModel, contactModel: contactModel)
-            
-//        case .call:
+                    .onChange(of: contactModel.nextScreen) { oldValue, newValue in
+                        currentScreen = contactModel.nextScreen
+                    }
+            case .call:
+                CallView(callModel: callModel, contactModel: contactModel)
 //            <#code#>CallView()
 //        case .shred:
 //            <#code#>ShredView()

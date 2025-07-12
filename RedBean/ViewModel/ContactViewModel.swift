@@ -18,6 +18,16 @@ class ContactViewModel: ObservableObject {
     @Published var contacts: [CNContact] = []
     @Published var accessGranted = false
     @Published var nextScreen: AppScreen = .contact //not connected to homeview's screen variable
+    
+    @Published var selectedContactID: String? = nil
+    @Published var selectedSchedule: Int? = nil
+    @Published var selectedPhoto: Int? = nil
+    
+    @Published var builtInSchedules = [
+        TimerSchedule(name: "Classic Pomodoro", workMinutes: 25, breakMinutes: 5),
+        TimerSchedule(name: "Short Focus", workMinutes: 20, breakMinutes: 10),
+        TimerSchedule(name: "Deep Work", workMinutes: 50, breakMinutes: 10)
+    ]
 
 //     func fetchContacts() {
 //         let store = CNContactStore()

@@ -16,5 +16,5 @@ enum AppScreen {
 //    case schedule
 //    case shred
 //    case settings
-//    case call
+    case call
 }
