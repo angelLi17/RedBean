@@ -16,49 +16,35 @@ struct ContactView: View {
     @State private var selectedContactID: String? = nil
     
     var body: some View {
-        GeometryReader { geometry in
+
+        ZStack {
             Image("Bg")
                 .resizable()
                 .scaledToFill()
                 .ignoresSafeArea()
-                .frame(width: geometry.size.width, height: geometry.size.height)
+                .frame(width: screenWidth, height: screenHeight)
             
-            ZStack {
-                VStack(spacing: 20) {
+            VStack(spacing: screenHeight/17) {
+                //header
+                headerView
+                
+                //three grids
+                VStack(spacing: screenHeight/30) {
                     
-                    //header
-                    headerView
+                    //contacts
+                    contactView
                     
-                    //three grids
-                    VStack(spacing: geometry.size.height/8) {
-                        
-                        //contacts
-                        contactView
-                        
-                        //schedule choice
-                        scheduleView
-                        
-                        //photobooth
-                        photoView
-                        
-                    }
+                    //schedule choice
+                    scheduleView
                     
-                    //footer
-                    footerView
+                    //photobooth
+                    photoView
+                    
                 }
-            }
-//            Button("Request Contacts Access") {
-//                contactModel.requestAccess()
-//            }
-//            List {
-//                Section(header: Text("Contacts")) {
-//                    ForEach(contactModel.contacts) { contact in
-//                        Text(contact.name)
-//                        Circle(contact.pfp)
-//                    }
-//                }
-//            }
             
+                //footer
+                footerView
+            }
         }
     }
     
@@ -87,15 +73,15 @@ struct ContactView: View {
             Color("aPink")
                 .cornerRadius(20)
                 .shadow(
-                    color: Color(red: 0, green: 0, blue: 0, opacity: 0.7), radius: 4, y: 4
+                    color: Color(red: 0, green: 0, blue: 0, opacity: 0.3), radius: 4, y: 4
                 )
             Color(.white)
                 .cornerRadius(10)
-                .padding(screenWidth/10/2)
-                .padding(.top, screenWidth/10/4)
+                .padding(screenWidth/10/3)
+                .padding(.top, screenWidth/10/2)
             Text("choose a friend to call")
-                .font(.custom("Biryani", size: 15))
-                .padding(.bottom, 19*screenWidth/10/4)
+                .font(.custom("Biryani", size: 20))
+                .padding(.bottom, 6*screenHeight/40)
                 .foregroundColor(Color("aRed"))
             
             List(contactModel.contacts, id: \.identifier) { contact in
@@ -112,27 +98,91 @@ struct ContactView: View {
                     .onTapGesture {
                         selectedContactID = contact.identifier
                         // Do something else on tap if needed
-                    }
+                }
             }
-            
-            .frame(width: 9*screenWidth/10, height: screenHeight/5)
+            .cornerRadius(10)
+            .padding(screenWidth/10/2)
+            .padding(.top, screenWidth/10/3)
         }
+        .frame(width: 9*screenWidth/11, height: screenHeight/5)
     }
 
     var scheduleView: some View {
-        Color(.white)
+        ZStack {
+            Color("aPink")
+                .cornerRadius(20)
+                .shadow(
+                    color: Color(red: 0, green: 0, blue: 0, opacity: 0.3), radius: 4, y: 4
+                )
+            Color(.white)
+                .cornerRadius(10)
+                .padding(screenWidth/10/3)
+                .padding(.top, screenWidth/10/2)
+            Text("choose a friend to call")
+                .font(.custom("Biryani", size: 20))
+                .padding(.bottom, 6*screenHeight/40)
+                .foregroundColor(Color("aRed"))
+            
+            List(contactModel.contacts, id: \.identifier) { contact in
+                Text("\(contact.givenName) \(contact.familyName)")
+                    .font(.headline)
+                    .padding(.vertical, 8)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(
+                        selectedContactID == contact.identifier
+                        ? Color.gray.opacity(0.3)
+                        : Color.clear
+                    )
+                    .contentShape(Rectangle()) // Makes the whole row tappable
+                    .onTapGesture {
+                        selectedContactID = contact.identifier
+                        // Do something else on tap if needed
+                }
+            }
             .cornerRadius(10)
             .padding(screenWidth/10/2)
-            .padding(.top, screenWidth/10/4)
-            .frame(width: 9*screenWidth/10, height: screenHeight/5)
+            .padding(.top, screenWidth/10/3)
+        }
+        .frame(width: 9*screenWidth/11, height: screenHeight/5)
     }
     
     var photoView: some View {
-        Color(.white)
+        ZStack {
+            Color("aPink")
+                .cornerRadius(20)
+                .shadow(
+                    color: Color(red: 0, green: 0, blue: 0, opacity: 0.3), radius: 4, y: 4
+                )
+            Color(.white)
+                .cornerRadius(10)
+                .padding(screenWidth/10/3)
+                .padding(.top, screenWidth/10/2)
+            Text("choose a friend to call")
+                .font(.custom("Biryani", size: 20))
+                .padding(.bottom, 6*screenHeight/40)
+                .foregroundColor(Color("aRed"))
+            
+            List(contactModel.contacts, id: \.identifier) { contact in
+                Text("\(contact.givenName) \(contact.familyName)")
+                    .font(.headline)
+                    .padding(.vertical, 8)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(
+                        selectedContactID == contact.identifier
+                        ? Color.gray.opacity(0.3)
+                        : Color.clear
+                    )
+                    .contentShape(Rectangle()) // Makes the whole row tappable
+                    .onTapGesture {
+                        selectedContactID = contact.identifier
+                        // Do something else on tap if needed
+                }
+            }
             .cornerRadius(10)
             .padding(screenWidth/10/2)
-            .padding(.top, screenWidth/10/4)
-            .frame(width: 9*screenWidth/10, height: screenHeight/5)
+            .padding(.top, screenWidth/10/3)
+        }
+        .frame(width: 9*screenWidth/11, height: screenHeight/5)
     }
     
     var footerView: some View {
