@@ -59,8 +59,7 @@ struct ContactView: View {
                     contactModel.nextScreen = .home
                 }
         }
-        .frame(width: screenWidth, height: screenHeight/20)
-        .opacity(0.9)
+        .frame(width: screenWidth, height: screenHeight/18)
         .background{
             Color("aPink")
                 .shadow(

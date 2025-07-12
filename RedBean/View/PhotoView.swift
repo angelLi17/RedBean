@@ -7,8 +7,8 @@
 
 import SwiftUI
 
-struct ScheduleView: View {
-    @ObservedObject var homeModel: HomeViewModel
+struct PhotoView: View {
+    @ObservedObject var photoModel: PhotoViewModel
     //no custom saved sched option for now
     
     var body: some View {

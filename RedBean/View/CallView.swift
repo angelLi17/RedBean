@@ -15,7 +15,14 @@ struct CallView: View {
     let screenWidth = UIScreen.main.bounds.width
     let screenHeight = UIScreen.main.bounds.height
     
-    @State private var selectedContactID: String? = nil
+    @State private var workTime: Bool = false
+    @State private var usePomodoroOrOtherDefault: Bool = true
+    
+    @State private var items: [ChecklistItem] = [
+           //ChecklistItem(text: "First task", isChecked: false)
+    ]
+    
+    @State private var newItemText: String = ""
     
     var body: some View {
 
@@ -25,6 +32,7 @@ struct CallView: View {
                 .scaledToFill()
                 .ignoresSafeArea()
                 .frame(width: screenWidth, height: screenHeight)
+                .opacity(0.3)
             
             VStack(spacing: screenHeight/17) {
                 //header
@@ -34,37 +42,30 @@ struct CallView: View {
                 VStack(spacing: screenHeight/30) {
                     
                     //contacts
-                    contactView
+                    callView
                     
                     //schedule choice
-                    scheduleView
+                    timerView
                     
                     //photobooth
-                    photoView
+                    checklistView
                     
                 }
             
                 //footer
                 footerView
+
             }
         }
     }
     
     var headerView: some View {
         HStack(spacing: 70) {
-            Text("Start a Bean")
+            Text(contactModel.selectedContactID ?? "Unknown Caller")
                 .font(.custom("Jua", size: 30))
                 .foregroundColor(Color("aRed"))
-            Image("HomeIcon")
-                .resizable()
-                .scaledToFill()
-                .frame(width: 40, height: 40)
-                .onTapGesture {
-                    contactModel.nextScreen = .home
-                }
         }
         .frame(width: screenWidth, height: screenHeight/20)
-        .opacity(0.9)
         .background{
             Color("aPink")
                 .shadow(
@@ -73,7 +74,7 @@ struct CallView: View {
         }
     }
     
-    var contactView: some View { //future=add scroll list for custom schedules adding
+    var callView: some View {
         ZStack {
             Color("aPink")
                 .cornerRadius(20)
@@ -116,67 +117,87 @@ struct CallView: View {
         .frame(width: 9*screenWidth/11, height: screenHeight/5)
     }
 
-    var scheduleView: some View {
-        ZStack {
-            Color("aPink")
-                .cornerRadius(20)
-                .shadow(
-                    color: Color(red: 0, green: 0, blue: 0, opacity: 0.3), radius: 4, y: 4
-                )
-            Color(.white)
-                .cornerRadius(10)
-                .padding(screenWidth/10/3)
-                .padding(.top, screenWidth/10/2)
-            Text("choose a work:break schedule")
+    var timerView: some View {
+        HStack {
+            //red timer
+            
+            //custom time and session type scheduler block
+            customTimeBlock
+        }
+//        .padding(8)
+    }
+
+    var customTimeBlock: some View {
+        VStack() {
+            Text("customize a time block")
                 .font(.custom("Biryani", size: 20))
-                .padding(.bottom, 6*screenHeight/40)
                 .foregroundColor(Color("aRed"))
             
-            List {
-                Text("Classic Pomo-dango—25:5")
+            //select a session type
+            HStack() {
+                Text("work")
+                    .font(.custom("Biryani", size: 20))
+                    .foregroundColor(workTime ? Color.white : Color("aRed"))
+                    .frame(width: screenWidth/4, height: screenWidth/12)
                     .background(
-                        contactModel.selectedSchedule==1
-                        ? Color.gray.opacity(0.3)
-                        : Color.clear
+                        (workTime ? Color("aRed") : Color.white)
+                            .cornerRadius(10)
                     )
                     .onTapGesture {
-                        contactModel.selectedSchedule=1
-                        // Do something else on tap if needed
+                        workTime = true;//add smt so its only if a session time is selected AND ALSO MAKE usePomodoro false
                     }
-                Text("Balanced Daifuku—20:10")
+                
+                Text("break")
+                    .font(.custom("Biryani", size: 20))
+                    .foregroundColor(workTime ? Color("aRed") : Color.white)
+                    .frame(width: screenWidth/4, height: screenWidth/12)
                     .background(
-                        contactModel.selectedSchedule==2
-                        ? Color.gray.opacity(0.3)
-                        : Color.clear
+                        (workTime ? Color.white : Color("aRed"))
+                            .cornerRadius(10)
                     )
                     .onTapGesture {
-                        contactModel.selectedSchedule=2
-                        // Do something else on tap if needed
-                    }
-                Text("Academic Injeolmi—50:10")
-                    .background(
-                        contactModel.selectedSchedule==3
-                        ? Color.gray.opacity(0.3)
-                        : Color.clear
-                    )
-                    .onTapGesture {
-                        contactModel.selectedSchedule=3
-                        // Do something else on tap if needed
+                        workTime = false; //only if a session time is selected
                     }
             }
-            .cornerRadius(10)
-            .padding(screenWidth/10/2)
-            .padding(.top, screenWidth/10/3)
-            .font(.custom("Biryani", size: 15))
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .listStyle(.plain)
+            
+            HStack {
+                Text("Select a time, then tap work/break to start. Custom path ends the default schedule.")
+                    .font(.custom("Biryani", size:10))
+                    .lineSpacing(-8)
+                    .padding(5)
+                Picker("Session Length", selection: $callModel.customTime) {
+                    ForEach(callModel.builtInTimes, id: \.self) { option in
+                        Text(option)
+                            .font(.custom("Biryani", size: 10))
+                    }
+                }
+                .pickerStyle(MenuPickerStyle())
+                // Show a text field if "Other" is selected
+                if callModel.customTime == "Other" {
+                    TextField("Enter custom session (e.g., 40 min)", text: $callModel.otherTime)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .font(.custom("Biryani", size: 10))
+                }
+            }
             .foregroundColor(Color("aRed"))
-            .contentShape(Rectangle())
+            .frame(width: 21*screenWidth/40, height: screenWidth/6)
+            .background(
+                Color.white
+                    .cornerRadius(10)
+            )
+            
         }
-        .frame(width: 9*screenWidth/11, height: screenHeight/5)
+        .frame(width: 9*screenWidth/11, height: screenHeight/8)
+        .background{
+            Color("aPink")
+                .cornerRadius(20)
+                .shadow(
+                    color: Color(red: 0, green: 0, blue: 0, opacity: 0.3), radius: 4, y: 4)
+        }
     }
     
-    var photoView: some View {
+    
+    var checklistView: some View {
         ZStack {
             Color("aPink")
                 .cornerRadius(20)
@@ -187,23 +208,41 @@ struct CallView: View {
                 .cornerRadius(10)
                 .padding(screenWidth/10/3)
                 .padding(.top, screenWidth/10/2)
-            Text("choose a photobooth theme")
+            Text("to-do checklist")
                 .font(.custom("Biryani", size: 20))
                 .padding(.bottom, 6*screenHeight/40)
                 .foregroundColor(Color("aRed"))
             
-            List {
-                Text("Mr. Diligent Red Bean")
-                    .background(
-                        contactModel.selectedPhoto==1
-                        ? Color.gray.opacity(0.3)
-                        : Color.clear
-                    )
-                    .onTapGesture {
-                        contactModel.selectedPhoto=1
-                        // Do something else on tap if needed
+            VStack {
+                ScrollView(.vertical) {
+                    VStack(alignment: .leading) {
+                        ForEach($items) { $item in
+                            ScrollView(.horizontal) {
+                                HStack {
+                                    Button(action: { item.isChecked.toggle() }) {
+                                        Image(systemName: item.isChecked ? "checkmark.square" : "square")
+                                    }
+                                    .buttonStyle(PlainButtonStyle())
+                                    TextField("To-do", text: $item.text)
+                                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                                        .frame(minWidth: 200, maxWidth: .infinity)
+                                }
+                                .padding(.vertical, 2)
+                            }
+                            .frame(height: 40) // Keeps each row a consistent height
+                        }
                     }
-                //coming soon: Mrs. Classy Vanilla Bean, Sleepy Mung Bean Baby, Ms. Capricious Chickpea, Sir Benign Black Bean
+                }
+                HStack {
+                    TextField("Add new task", text: $newItemText)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                    Button("Add") {
+                        if !newItemText.isEmpty {
+                            items.append(ChecklistItem(text: newItemText, isChecked: false))
+                            newItemText = ""
+                        }
+                    }
+                }
             }
             .cornerRadius(10)
             .padding(screenWidth/10/2)
@@ -223,17 +262,13 @@ struct CallView: View {
                 .frame(width:screenWidth/7, height:screenHeight/22)
                 .foregroundColor(Color("aPink"))
                 .cornerRadius(10)
-            Text("START")
+            Text("End Bean")
                 .foregroundColor(Color.white)
                 .font(.custom("Biryani", size: 20))
                 .frame(width:3*screenWidth/7, height:screenHeight/22)
-                .background{
-                    (contactModel.selectedContactID != nil && contactModel.selectedSchedule != nil && contactModel.selectedPhoto != nil) ? Color("aRed") : Color.gray.opacity(0.3)
-                }
+                .background(Color("aRed"))
                 .onTapGesture {
-                    if (contactModel.selectedContactID != nil && contactModel.selectedSchedule != nil && contactModel.selectedPhoto != nil) {
-                        contactModel.nextScreen = .call
-                    }
+                    contactModel.nextScreen = .photo
                 }
             Rectangle()
                 .frame(width:screenWidth/7, height:screenHeight/22)
@@ -243,5 +278,5 @@ struct CallView: View {
     }
 }
 #Preview {
-    ContactView(homeModel: HomeViewModel(), contactModel: ContactViewModel())
+    CallView(callModel: CallViewModel(), contactModel: ContactViewModel())
 }
