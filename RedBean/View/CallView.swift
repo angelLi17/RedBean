@@ -15,8 +15,11 @@ struct CallView: View {
     let screenWidth = UIScreen.main.bounds.width
     let screenHeight = UIScreen.main.bounds.height
     
-    @State private var workTime: Bool = false
+    @State private var workTime: Bool = true
     @State private var usePomodoroOrOtherDefault: Bool = true
+    @State private var timerActive = false
+    
+    @State var timeRemaining: Int
     
     @State private var items: [ChecklistItem] = [
            //ChecklistItem(text: "First task", isChecked: false)
@@ -51,7 +54,7 @@ struct CallView: View {
                     checklistView
                     
                 }
-            
+                .frame(width: 9*screenWidth/11)
                 //footer
                 footerView
 
@@ -87,7 +90,7 @@ struct CallView: View {
                 .padding(.top, screenWidth/10/2)
             Text("choose a friend to call")
                 .font(.custom("Biryani", size: 20))
-                .padding(.bottom, 6*screenHeight/40)
+                .padding(.bottom, 6*screenHeight/30)
                 .foregroundColor(Color("aRed"))
             
             List(contactModel.contacts, id: \.identifier) { contact in
@@ -114,31 +117,49 @@ struct CallView: View {
             .listStyle(.plain)
             .foregroundColor(Color("aRed"))
         }
-        .frame(width: 9*screenWidth/11, height: screenHeight/5)
+        .frame(width: 9*screenWidth/11, height: screenHeight/4)
     }
 
     var timerView: some View {
         HStack {
             //red timer
+            redTimerView
             
+            Spacer(minLength: screenWidth/20)
             //custom time and session type scheduler block
-            customTimeBlock
+            if usePomodoroOrOtherDefault {
+                ZStack {
+                    Color("aPink")
+                        .cornerRadius(20)
+//                        .shadow(
+//                            color: Color(red: 0, green: 0, blue: 0, opacity: 0.3), radius: 4, y: 4)
+//                        .opacity(0.7)
+                    Text("Tap to switch to custom time blocking scheduler.")
+                        .font(.custom("Jua", size:18))
+                        .foregroundColor(Color("aRed"))
+                        .opacity(0.6)
+                        .multilineTextAlignment(.center)
+                        .padding()
+                }
+                .frame(width: 7*screenWidth/15, height: screenHeight/8)
+                .onTapGesture {
+                    usePomodoroOrOtherDefault=false
+                }
+            } else {
+                customTimeBlock
+            }
+            
         }
-//        .padding(8)
     }
 
     var customTimeBlock: some View {
-        VStack() {
-            Text("customize a time block")
-                .font(.custom("Biryani", size: 20))
-                .foregroundColor(Color("aRed"))
-            
+        VStack(spacing:8) {
             //select a session type
             HStack() {
                 Text("work")
                     .font(.custom("Biryani", size: 20))
                     .foregroundColor(workTime ? Color.white : Color("aRed"))
-                    .frame(width: screenWidth/4, height: screenWidth/12)
+                    .frame(width: 2*screenWidth/7, height: screenWidth/12)
                     .background(
                         (workTime ? Color("aRed") : Color.white)
                             .cornerRadius(10)
@@ -150,7 +171,7 @@ struct CallView: View {
                 Text("break")
                     .font(.custom("Biryani", size: 20))
                     .foregroundColor(workTime ? Color("aRed") : Color.white)
-                    .frame(width: screenWidth/4, height: screenWidth/12)
+                    .frame(width: 2*screenWidth/7, height: screenWidth/12)
                     .background(
                         (workTime ? Color.white : Color("aRed"))
                             .cornerRadius(10)
@@ -161,7 +182,7 @@ struct CallView: View {
             }
             
             HStack {
-                Text("Select a time, then tap work/break to start. Custom path ends the default schedule.")
+                Text("1) Select a time 2) Tap work/break. Custom path ends the default timer.")
                     .font(.custom("Biryani", size:10))
                     .lineSpacing(-8)
                     .padding(5)
@@ -172,6 +193,7 @@ struct CallView: View {
                     }
                 }
                 .pickerStyle(MenuPickerStyle())
+                .foregroundColor(Color("aRed"))
                 // Show a text field if "Other" is selected
                 if callModel.customTime == "Other" {
                     TextField("Enter custom session (e.g., 40 min)", text: $callModel.otherTime)
@@ -180,20 +202,73 @@ struct CallView: View {
                 }
             }
             .foregroundColor(Color("aRed"))
-            .frame(width: 21*screenWidth/40, height: screenWidth/6)
+            .frame(width: 21*screenWidth/35, height: screenWidth/6)
             .background(
                 Color.white
                     .cornerRadius(10)
             )
             
         }
-        .frame(width: 9*screenWidth/11, height: screenHeight/8)
+        .frame(width: 7*screenWidth/10, height: screenHeight/6)
         .background{
             Color("aPink")
                 .cornerRadius(20)
                 .shadow(
                     color: Color(red: 0, green: 0, blue: 0, opacity: 0.3), radius: 4, y: 4)
         }
+    }
+    
+    var redTimerView : some View {
+        VStack {
+            ZStack {
+                Circle()
+                    .stroke(Color.gray.opacity(0.2), lineWidth: 20)
+                Circle()
+                    .trim(from: 0, to: CGFloat(timeFraction))
+                    .stroke(workTime ? Color("aRed") : Color.green, style: StrokeStyle(lineWidth: 20, lineCap: .round))
+                    .rotationEffect(.degrees(-90))
+                    .animation(.linear, value: timeRemaining)
+                VStack {
+                    Text(timeString)
+                        .font(.custom("Biryani", size: 25))
+                    Button(timerActive ? "pause" : "start") {
+                        timerActive.toggle()
+                    }
+                        .foregroundStyle(Color("aRed"))
+                        .font(.custom("Jua", size: 18))
+                }
+                
+            }
+            .frame(width: screenWidth/4, height: screenWidth/4)
+
+            if !timerActive && timeRemaining == 0 {
+                //sound
+            }
+        }
+        .onReceive(Timer.publish(every: 1, on: .main, in: .common).autoconnect()) { _ in
+            guard timerActive, timeRemaining > 0 else { return }
+            timeRemaining -= 1
+            if timeRemaining == 0 {
+                timerActive = false
+                if usePomodoroOrOtherDefault {
+                    // Switch between work and break
+                    workTime.toggle()
+                    timeRemaining = (workTime ? callModel.builtInSchedules[contactModel.selectedSchedule ?? 0].workMinutes : callModel.builtInSchedules[contactModel.selectedSchedule ?? 0].breakMinutes) * 60
+                    timerActive = true
+                }
+            }
+        }
+    }
+    
+    private var timeFraction: Double {
+        let total = (workTime ? callModel.builtInSchedules[contactModel.selectedSchedule ?? 0].workMinutes : callModel.builtInSchedules[contactModel.selectedSchedule ?? 0].breakMinutes) * 60
+        return total == 0 ? 0 : Double(timeRemaining) / Double(total)
+    }
+
+    private var timeString: String {
+        let minutes = timeRemaining / 60
+        let seconds = timeRemaining % 60
+        return String(format: "%02d:%02d", minutes, seconds)
     }
     
     
@@ -278,5 +353,5 @@ struct CallView: View {
     }
 }
 #Preview {
-    CallView(callModel: CallViewModel(), contactModel: ContactViewModel())
+    CallView(callModel: CallViewModel(), contactModel: ContactViewModel(), timeRemaining: 25)
 }

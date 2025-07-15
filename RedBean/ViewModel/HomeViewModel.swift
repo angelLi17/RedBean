@@ -29,8 +29,8 @@ class HomeViewModel: ObservableObject {
     @Published var showSettingsMenu = false
 
     func menu1Toggle() {
-        menu1Clicked = true
         nextScreen = .contact
+        menu1Clicked = true
     }
     
     func menu2Toggle() {

@@ -50,7 +50,6 @@ struct ContentView: View {
                 HomeView(homeModel: homeModel)
                     .onChange(of: homeModel.nextScreen) { oldValue, newValue in
                         if newValue != .home {
-                            currentScreen = homeModel.nextScreen
                             homeModel.menu1Clicked = false
                             homeModel.menu2Clicked = false
                             homeModel.menu3Clicked = false
@@ -58,6 +57,10 @@ struct ContentView: View {
                             homeModel.set2Clicked = false
                             homeModel.set3Clicked = false
                             homeModel.showSettingsMenu = false
+                            let temp = homeModel.nextScreen
+                            homeModel.nextScreen = .home
+                            contactModel.nextScreen = .contact //maybe need to do "if, newValue is .contact but maybe not
+                            currentScreen = temp
                         }
                     }
             case .contact:
@@ -66,7 +69,7 @@ struct ContentView: View {
                         currentScreen = contactModel.nextScreen
                     }
             case .call:
-                CallView(callModel: callModel, contactModel: contactModel)
+            CallView(callModel: callModel, contactModel: contactModel, timeRemaining: callModel.builtInSchedules[contactModel.selectedSchedule ?? 0].workMinutes)
                     .onChange(of: callModel.nextScreen) { oldValue, newValue in
                         currentScreen = callModel.nextScreen
                     }
