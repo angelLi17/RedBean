@@ -28,6 +28,22 @@ class ContactViewModel: ObservableObject {
         TimerSchedule(name: "Short Focus", workMinutes: 20, breakMinutes: 10),
         TimerSchedule(name: "Deep Work", workMinutes: 50, breakMinutes: 10)
     ]
+    @Published var registeredContacts: [String: String] = [:] // [contact.identifier: uid]
+
+    func checkAllContactsRegistration() {
+        for contact in contacts {
+            for phoneLabel in contact.phoneNumbers {
+                let numberString = phoneLabel.value.stringValue
+                checkIfPhoneNumberRegistered(numberString) { isRegistered, uid in
+                    DispatchQueue.main.async {
+                        if isRegistered, let uid = uid {
+                            self.registeredContacts[contact.identifier] = uid
+                        }
+                    }
+                }
+            }
+        }
+    }
 
 //     func fetchContacts() {
 //         let store = CNContactStore()
@@ -85,5 +101,17 @@ class ContactViewModel: ObservableObject {
             print("Failed to fetch contacts: \(error)")
         }
         return contacts
+    }
+    
+    
+    func checkIfPhoneNumberRegistered(_ phoneNumber: String, completion: @escaping (Bool, String?) -> Void) {
+        let db = Firestore.firestore()
+        db.collection("phoneToUID").document(phoneNumber).getDocument { snapshot, error in
+            if let doc = snapshot, doc.exists, let data = doc.data(), let uid = data["uid"] as? String {
+                completion(true, uid)
+            } else {
+                completion(false, nil)
+            }
+        }
     }
 }

@@ -10,6 +10,9 @@
 		0B8037782DDA94F300DF9593 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 0B8037772DDA94F300DF9593 /* FirebaseAuth */; };
 		0B80377A2DDA94F300DF9593 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 0B8037792DDA94F300DF9593 /* FirebaseFirestore */; };
 		0B8037812DDAEA0900DF9593 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 0B8037802DDAEA0900DF9593 /* GoogleSignInSwift */; };
+		0BDAA3252E26D4560088AA8E /* StreamVideo in Frameworks */ = {isa = PBXBuildFile; productRef = 0BDAA3242E26D4560088AA8E /* StreamVideo */; };
+		0BDAA3272E26D4560088AA8E /* StreamVideoSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 0BDAA3262E26D4560088AA8E /* StreamVideoSwiftUI */; };
+		0BDAA32A2E26D6F80088AA8E /* StreamWebRTC in Frameworks */ = {isa = PBXBuildFile; productRef = 0BDAA3292E26D6F80088AA8E /* StreamWebRTC */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -72,7 +75,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				0B8037812DDAEA0900DF9593 /* GoogleSignInSwift in Frameworks */,
+				0BDAA32A2E26D6F80088AA8E /* StreamWebRTC in Frameworks */,
 				0B8037782DDA94F300DF9593 /* FirebaseAuth in Frameworks */,
+				0BDAA3252E26D4560088AA8E /* StreamVideo in Frameworks */,
+				0BDAA3272E26D4560088AA8E /* StreamVideoSwiftUI in Frameworks */,
 				0B80377A2DDA94F300DF9593 /* FirebaseFirestore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -137,6 +143,9 @@
 				0B8037772DDA94F300DF9593 /* FirebaseAuth */,
 				0B8037792DDA94F300DF9593 /* FirebaseFirestore */,
 				0B8037802DDAEA0900DF9593 /* GoogleSignInSwift */,
+				0BDAA3242E26D4560088AA8E /* StreamVideo */,
+				0BDAA3262E26D4560088AA8E /* StreamVideoSwiftUI */,
+				0BDAA3292E26D6F80088AA8E /* StreamWebRTC */,
 			);
 			productName = RedBean;
 			productReference = 0BEA10602DD305870026F746 /* RedBean.app */;
@@ -223,6 +232,8 @@
 			packageReferences = (
 				0B8037762DDA94F300DF9593 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				0B80377F2DDAEA0900DF9593 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+				0BDAA3232E26D4560088AA8E /* XCRemoteSwiftPackageReference "stream-video-swift" */,
+				0BDAA3282E26D6F80088AA8E /* XCRemoteSwiftPackageReference "stream-video-swift-webrtc" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 0BEA10612DD305870026F746 /* Products */;
@@ -424,7 +435,9 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = RedBean/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "RedBean requires camera access in order to capture and transmit video";
 				INFOPLIST_KEY_NSContactsUsageDescription = "To help you call with your contacts";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "RedBean requires microphone access in order to capture and transmit audio";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -464,7 +477,9 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = RedBean/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "RedBean requires camera access in order to capture and transmit video";
 				INFOPLIST_KEY_NSContactsUsageDescription = "To help you call with your contacts";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "RedBean requires microphone access in order to capture and transmit audio";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -636,6 +651,22 @@
 				minimumVersion = 8.0.0;
 			};
 		};
+		0BDAA3232E26D4560088AA8E /* XCRemoteSwiftPackageReference "stream-video-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/GetStream/stream-video-swift.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+		0BDAA3282E26D6F80088AA8E /* XCRemoteSwiftPackageReference "stream-video-swift-webrtc" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/GetStream/stream-video-swift-webrtc.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -653,6 +684,21 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 0B80377F2DDAEA0900DF9593 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
 			productName = GoogleSignInSwift;
+		};
+		0BDAA3242E26D4560088AA8E /* StreamVideo */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0BDAA3232E26D4560088AA8E /* XCRemoteSwiftPackageReference "stream-video-swift" */;
+			productName = StreamVideo;
+		};
+		0BDAA3262E26D4560088AA8E /* StreamVideoSwiftUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0BDAA3232E26D4560088AA8E /* XCRemoteSwiftPackageReference "stream-video-swift" */;
+			productName = StreamVideoSwiftUI;
+		};
+		0BDAA3292E26D6F80088AA8E /* StreamWebRTC */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 0BDAA3282E26D6F80088AA8E /* XCRemoteSwiftPackageReference "stream-video-swift-webrtc" */;
+			productName = StreamWebRTC;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

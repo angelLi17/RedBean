@@ -84,33 +84,39 @@ struct ContactView: View {
                 .padding(.bottom, 6*screenHeight/40)
                 .foregroundColor(Color("aRed"))
             
-            List(contactModel.contacts, id: \.identifier) { contact in
-                Text("\(contact.givenName) \(contact.familyName)")
-                    .font(.headline)
-                    .padding(.vertical, 8)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(
-                        contactModel.selectedContactID == contact.identifier
-                        ? Color.gray.opacity(0.3)
-                        : Color.clear
-                    )
-                    .contentShape(Rectangle()) // Makes the whole row tappable
-                    .onTapGesture {
-                        contactModel.selectedContactID = contact.identifier
-                        // Do something else on tap if needed
-                }
-            }
-            .cornerRadius(10)
-            .padding(screenWidth/10/2)
-            .padding(.top, screenWidth/10/3)
-            .font(.custom("Biryani", size: 15))
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .listStyle(.plain)
-            .foregroundColor(Color("aRed"))
+            contactViewHelper
         }
         .frame(width: 9*screenWidth/11, height: screenHeight/5)
     }
-
+    var contactViewHelper: some View {
+        List(contactModel.contacts, id: \.identifier) { contact in
+            contactModel.checkIfPhoneNumberRegistered(contact.phoneNumber) { isRegistered, uid in
+                if isRegistered, let uid = uid {
+                    Text("\(contact.givenName) \(contact.familyName)")
+                        .font(.headline)
+                        .padding(.vertical, 8)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(
+                            contactModel.selectedContactID == contact.identifier
+                                        ? Color.gray.opacity(0.3): Color.clear
+                                )
+                        .contentShape(Rectangle()) // Makes the whole row tappable
+                        .onTapGesture {
+                            contactModel.selectedContactID = contact.identifier
+                        // Do something else on tap if needed
+                    }
+                }
+            }
+        }
+        .cornerRadius(10)
+        .padding(screenWidth/10/2)
+        .padding(.top, screenWidth/10/3)
+        .font(.custom("Biryani", size: 15))
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .listStyle(.plain)
+        .foregroundColor(Color("aRed"))
+    }
+    
     var scheduleView: some View {
         ZStack {
             Color("aPink")
