@@ -38,6 +38,7 @@ Also towards the end and stopped maintaining the view viewmodel model architectu
 🚧 WIP 🚧
 
 ### Hackatime Note
-__ hours spent actually TYPING code tracked with hackatime (wakatime with keystroke timeout of 2 MINS)...sometimes I spend 3 hours and cry cuz it's only tracked 40 minutes 💀. I started earlier so for Athena it's __ hours (this project is under 3 time thingies on Hackatime: RedBean, <<LAST \PROJECT>> and firebase-ios-sdk)
+38h 21min spent actually TYPING code tracked with hackatime (wakatime with keystroke timeout of 2 MINS)...sometimes I spend 3 hours and cry cuz it's only tracked 40 minutes 💀. I also started earlier so for Athena it's actually around like 50 hours (this project is under 3 time thingies on Hackatime: RedBean, <<LAST \PROJECT>> and firebase-ios-sdk). Hackatime badge below for proof <3
 
+![Hackatime Badge](https://hackatime.hackclub.com/api/v1/badge/U01751C6SA3/angelLi17/RedBean)
 [![Athena Award Badge](https://img.shields.io/endpoint?url=https%3A%2F%2Faward.athena.hackclub.com%2Fapi%2Fbadge)](https://award.athena.hackclub.com?utm_source=readme)
