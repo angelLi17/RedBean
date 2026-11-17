@@ -36,24 +36,29 @@ class LoginViewModel: ObservableObject {
                 self.errorMessage = error!.localizedDescription
             } else {
                 if let user = Auth.auth().currentUser {
-                    // Load the saved phone number first: ContentView routes as soon as userID changes.
-                    Firestore.firestore().collection("users").document(user.uid).getDocument { snapshot, _ in
-                        let phone = snapshot?.data()?["phone"] as? String ?? ""
-                        self.phoneNumber = phone
-                        self.displayName = user.displayName ?? ""
-                        self.appUser = AppUser(
-                            id: user.uid,
-                            name: user.displayName,
-                            imageURL: user.photoURL?.absoluteString,
-                            phonenum: phone
-                        )
-                        self.userID = user.uid
-                    }
+                    self.restoreSession(for: user)
                 }
             }
         }
     }
     
+    /// Loads the profile for a signed-in user (after login, or when the app reopens already signed in).
+    /// The phone number loads first because ContentView routes as soon as userID changes.
+    func restoreSession(for user: User) {
+        Firestore.firestore().collection("users").document(user.uid).getDocument { snapshot, _ in
+            let phone = snapshot?.data()?["phone"] as? String ?? ""
+            self.phoneNumber = phone
+            self.displayName = user.displayName ?? ""
+            self.appUser = AppUser(
+                id: user.uid,
+                name: user.displayName,
+                imageURL: user.photoURL?.absoluteString,
+                phonenum: phone
+            )
+            self.userID = user.uid
+        }
+    }
+
     func register(email: String, password: String) {
          Auth.auth().createUser(withEmail: email, password: password) { result, error in
             if (error != nil) {

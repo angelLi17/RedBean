@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FirebaseAuth
 
 struct ContentView: View {
     @State private var currentScreen: AppScreen = .loading
@@ -13,38 +14,42 @@ struct ContentView: View {
     @StateObject var homeModel = HomeViewModel()
     @StateObject var contactModel = ContactViewModel()
     @StateObject var callModel = CallViewModel()
-    @StateObject var photoModel = PhotoViewModel()
 
     var body: some View {
+        screen
+            // A ringing call answered from the iPhone call screen opens the call from anywhere.
+            .onChange(of: callModel.answeredIncomingCall) { _, _ in
+                currentScreen = .call
+            }
+    }
+
+    @ViewBuilder
+    private var screen: some View {
         switch currentScreen {
             case .loading:
                 LoadView()
                     .onAppear {
                         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                            currentScreen = .login
+                            // Firebase remembers who signed in last time; skip the login screen for them.
+                            if let user = Auth.auth().currentUser {
+                                viewModel.restoreSession(for: user)
+                            } else {
+                                currentScreen = .login
+                            }
                         }
+                    }
+                    .onChange(of: viewModel.userID) { _, newValue in
+                        if !newValue.isEmpty { routeAfterSignIn() }
                     }
             case .login:
                 LoginView(viewModel: viewModel)
                     .onChange(of: viewModel.userID) { oldValue, newValue in
-                        if newValue != "" {
-                            if viewModel.needsProfileSetup {
-                                currentScreen = .displayName
-                            } else {
-                                currentScreen = .home
-                                homeModel.userID = viewModel.userID
-                                homeModel.displayName = viewModel.displayName
-                            }
-                        }
+                        if newValue != "" { routeAfterSignIn() }
                     }
             case .displayName:
                 DisplayNameView(viewModel: viewModel)
                     .onChange(of: viewModel.profileComplete) { oldValue, newValue in
-                        if newValue {
-                            currentScreen = .home
-                            homeModel.userID = viewModel.userID
-                            homeModel.displayName = viewModel.displayName
-                        }
+                        if newValue { goHome() }
                     }
             case .home:
                 HomeView(homeModel: homeModel)
@@ -66,19 +71,25 @@ struct ContentView: View {
             case .contact:
                 ContactView(homeModel: homeModel, contactModel: contactModel)
                     .onChange(of: contactModel.nextScreen) { oldValue, newValue in
-                        if newValue == .call {
-                            callModel.currentUser = viewModel.appUser
-                            callModel.nextScreen = .call
+                        if newValue == .call, let friend = contactModel.selectedFriend {
+                            callModel.prepareBean(
+                                friendUID: friend.uid,
+                                friendName: friend.name,
+                                schedule: selectedSchedule
+                            )
                         }
                         currentScreen = contactModel.nextScreen
                     }
             case .call:
-                CallView(callModel: callModel, contactModel: contactModel)
+                CallView(callModel: callModel)
                     .onChange(of: callModel.nextScreen) { oldValue, newValue in
-                        currentScreen = callModel.nextScreen
+                        currentScreen = newValue
                     }
             case .photo:
-                PhotoView(photoModel: photoModel)
+                PhotoView(callModel: callModel)
+                    .onChange(of: callModel.nextScreen) { oldValue, newValue in
+                        currentScreen = newValue
+                    }
 //        case .shred:
 //            <#code#>ShredView()
 //        case .settings:
@@ -86,6 +97,30 @@ struct ContentView: View {
 //        case .schedule:
 //            <#code#>
         }
+    }
+
+    /// The schedule picked on the Start a Bean screen (its rows are numbered 1...3).
+    private var selectedSchedule: TimerSchedule {
+        let schedules = callModel.builtInSchedules
+        let index = (contactModel.selectedSchedule ?? 1) - 1
+        return schedules[min(max(index, 0), schedules.count - 1)]
+    }
+
+    private func routeAfterSignIn() {
+        if viewModel.needsProfileSetup {
+            currentScreen = .displayName
+        } else {
+            goHome()
+        }
+    }
+
+    private func goHome() {
+        homeModel.userID = viewModel.userID
+        homeModel.displayName = viewModel.displayName
+        currentScreen = .home
+        // Connect to Stream now so friends can ring this phone.
+        callModel.currentUser = viewModel.appUser
+        Task { await callModel.connect() }
     }
 }
 

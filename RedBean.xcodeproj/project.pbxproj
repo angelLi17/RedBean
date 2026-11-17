@@ -438,6 +438,7 @@
 				INFOPLIST_KEY_NSCameraUsageDescription = "RedBean requires camera access in order to capture and transmit video";
 				INFOPLIST_KEY_NSContactsUsageDescription = "To help you call with your contacts";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "RedBean requires microphone access in order to capture and transmit audio";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "RedBean saves your photobooth strips to your photo library";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -480,6 +481,7 @@
 				INFOPLIST_KEY_NSCameraUsageDescription = "RedBean requires camera access in order to capture and transmit video";
 				INFOPLIST_KEY_NSContactsUsageDescription = "To help you call with your contacts";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "RedBean requires microphone access in order to capture and transmit audio";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "RedBean saves your photobooth strips to your photo library";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
