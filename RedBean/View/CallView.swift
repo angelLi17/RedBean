@@ -6,25 +6,17 @@
 //
 
 import SwiftUI
+import StreamVideo
+import StreamVideoSwiftUI
 
 struct CallView: View {
 
     @ObservedObject var callModel: CallViewModel
-    @ObservedObject var contactModel : ContactViewModel
     
     let screenWidth = UIScreen.main.bounds.width
     let screenHeight = UIScreen.main.bounds.height
     
-    @State private var workTime: Bool = true
     @State private var usePomodoroOrOtherDefault: Bool = true
-    @State private var timerActive = false
-    
-    @State var timeRemaining: Int
-    
-    @State private var items: [ChecklistItem] = [
-           //ChecklistItem(text: "First task", isChecked: false)
-    ]
-    
     @State private var newItemText: String = ""
     
     var body: some View {
@@ -60,11 +52,20 @@ struct CallView: View {
 
             }
         }
+        .task {
+            // Ringing calls answered from the iPhone call screen are already joined.
+            if callModel.call == nil {
+                await callModel.startBean()
+            }
+        }
+        .onReceive(Timer.publish(every: 1, on: .main, in: .common).autoconnect()) { _ in
+            callModel.tick()
+        }
     }
     
     var headerView: some View {
         HStack(spacing: 70) {
-            Text(contactModel.selectedContactID ?? "Unknown Caller")
+            Text(callModel.friendName)
                 .font(.custom("Jua", size: 30))
                 .foregroundColor(Color("aRed"))
         }
@@ -84,40 +85,99 @@ struct CallView: View {
                 .shadow(
                     color: Color(red: 0, green: 0, blue: 0, opacity: 0.3), radius: 4, y: 4
                 )
-            Color(.white)
-                .cornerRadius(10)
-                .padding(screenWidth/10/3)
-                .padding(.top, screenWidth/10/2)
-            Text("choose a friend to call")
-                .font(.custom("Biryani", size: 20))
-                .padding(.bottom, 6*screenHeight/30)
-                .foregroundColor(Color("aRed"))
-            
-            List(contactModel.contacts, id: \.identifier) { contact in
-                Text("\(contact.givenName) \(contact.familyName)")
-                    .font(.headline)
-                    .padding(.vertical, 8)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(
-                        contactModel.selectedContactID == contact.identifier
-                        ? Color.gray.opacity(0.3)
-                        : Color.clear
-                    )
-                    .contentShape(Rectangle()) // Makes the whole row tappable
-                    .onTapGesture {
-                        contactModel.selectedContactID = contact.identifier
-                        // Do something else on tap if needed
+            GeometryReader { geo in
+                ZStack {
+                    remoteVideo(size: geo.size)
+
+                    if let me = callModel.localParticipant {
+                        VideoCallParticipantView(
+                            viewFactory: DefaultViewFactory.shared,
+                            participant: me,
+                            id: "\(me.id)-local",
+                            availableFrame: CGRect(x: 0, y: 0, width: geo.size.width / 3.5, height: geo.size.height / 2),
+                            contentMode: .scaleAspectFill,
+                            customData: ["videoOn": .bool(callModel.cameraOn)],
+                            call: callModel.call
+                        )
+                        .frame(width: geo.size.width / 3.5, height: geo.size.height / 2)
+                        .cornerRadius(8)
+                        .clipped()
+                        .padding(6)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+                    }
+
+                    callControls
+                        .padding(6)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
                 }
             }
+            .background(Color.white)
             .cornerRadius(10)
-            .padding(screenWidth/10/2)
-            .padding(.top, screenWidth/10/3)
-            .font(.custom("Biryani", size: 15))
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .listStyle(.plain)
-            .foregroundColor(Color("aRed"))
+            .clipped()
+            .padding(screenWidth/10/3)
         }
         .frame(width: 9*screenWidth/11, height: screenHeight/4)
+    }
+
+    @ViewBuilder
+    private func remoteVideo(size: CGSize) -> some View {
+        if let friend = callModel.remoteParticipant {
+            VideoCallParticipantView(
+                viewFactory: DefaultViewFactory.shared,
+                participant: friend,
+                availableFrame: CGRect(origin: .zero, size: size),
+                contentMode: .scaleAspectFill,
+                customData: [:],
+                call: callModel.call
+            )
+            .frame(width: size.width, height: size.height)
+        } else {
+            VStack(spacing: 8) {
+                Text(statusText)
+                    .font(.custom("Biryani", size: 16))
+                    .foregroundColor(Color("aRed"))
+                    .multilineTextAlignment(.center)
+                if case .failed = callModel.callStatus {
+                    Button("try again") {
+                        Task { await callModel.startBean() }
+                    }
+                    .font(.custom("Jua", size: 18))
+                    .foregroundStyle(Color("aRed"))
+                }
+            }
+            .padding()
+            .frame(width: size.width, height: size.height)
+        }
+    }
+
+    private var statusText: String {
+        let name = callModel.friendName
+        switch callModel.callStatus {
+        case .idle, .connecting: return "connecting..."
+        case .waitingForFriend: return "calling \(name)..."
+        case .inCall: return ""
+        case .failed(let message): return "couldn't connect: \(message)"
+        }
+    }
+
+    private var callControls: some View {
+        HStack(spacing: 10) {
+            controlButton(callModel.micOn ? "mic.fill" : "mic.slash.fill", action: callModel.toggleMic)
+            controlButton(callModel.cameraOn ? "video.fill" : "video.slash.fill", action: callModel.toggleCamera)
+            controlButton("arrow.triangle.2.circlepath.camera", action: callModel.flipCamera)
+        }
+        .opacity(callModel.call == nil ? 0 : 1)
+    }
+
+    private func controlButton(_ systemName: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: systemName)
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundColor(.white)
+                .frame(width: 32, height: 32)
+                .background(Color("aRed").opacity(0.85))
+                .clipShape(Circle())
+        }
     }
 
     var timerView: some View {
@@ -165,7 +225,7 @@ struct CallView: View {
                             .cornerRadius(10)
                     )
                     .onTapGesture {
-                        workTime = true;//add smt so its only if a session time is selected AND ALSO MAKE usePomodoro false
+                        callModel.setCustomTimer(isWork: true) // only applies once a session time is selected
                     }
                 
                 Text("break")
@@ -177,7 +237,7 @@ struct CallView: View {
                             .cornerRadius(10)
                     )
                     .onTapGesture {
-                        workTime = false; //only if a session time is selected
+                        callModel.setCustomTimer(isWork: false) // only applies once a session time is selected
                     }
             }
             
@@ -218,21 +278,23 @@ struct CallView: View {
         }
     }
     
+    private var workTime: Bool { callModel.timer.isWork }
+
     var redTimerView : some View {
         VStack {
             ZStack {
                 Circle()
                     .stroke(Color.gray.opacity(0.2), lineWidth: 20)
                 Circle()
-                    .trim(from: 0, to: CGFloat(timeFraction))
+                    .trim(from: 0, to: CGFloat(callModel.timer.fraction(at: callModel.now)))
                     .stroke(workTime ? Color("aRed") : Color.green, style: StrokeStyle(lineWidth: 20, lineCap: .round))
                     .rotationEffect(.degrees(-90))
-                    .animation(.linear, value: timeRemaining)
+                    .animation(.linear, value: callModel.now)
                 VStack {
                     Text(timeString)
                         .font(.custom("Biryani", size: 25))
-                    Button(timerActive ? "pause" : "start") {
-                        timerActive.toggle()
+                    Button(callModel.timer.isRunning ? "pause" : "start") {
+                        callModel.toggleTimer()
                     }
                         .foregroundStyle(Color("aRed"))
                         .font(.custom("Jua", size: 18))
@@ -240,35 +302,12 @@ struct CallView: View {
                 
             }
             .frame(width: screenWidth/4, height: screenWidth/4)
-
-            if !timerActive && timeRemaining == 0 {
-                //sound
-            }
         }
-        .onReceive(Timer.publish(every: 1, on: .main, in: .common).autoconnect()) { _ in
-            guard timerActive, timeRemaining > 0 else { return }
-            timeRemaining -= 1
-            if timeRemaining == 0 {
-                timerActive = false
-                if usePomodoroOrOtherDefault {
-                    // Switch between work and break
-                    workTime.toggle()
-                    timeRemaining = (workTime ? callModel.builtInSchedules[contactModel.selectedSchedule ?? 0].workMinutes : callModel.builtInSchedules[contactModel.selectedSchedule ?? 0].breakMinutes) * 60
-                    timerActive = true
-                }
-            }
-        }
-    }
-    
-    private var timeFraction: Double {
-        let total = (workTime ? callModel.builtInSchedules[contactModel.selectedSchedule ?? 0].workMinutes : callModel.builtInSchedules[contactModel.selectedSchedule ?? 0].breakMinutes) * 60
-        return total == 0 ? 0 : Double(timeRemaining) / Double(total)
     }
 
     private var timeString: String {
-        let minutes = timeRemaining / 60
-        let seconds = timeRemaining % 60
-        return String(format: "%02d:%02d", minutes, seconds)
+        let remaining = callModel.timer.remaining(at: callModel.now)
+        return String(format: "%02d:%02d", remaining / 60, remaining % 60)
     }
     
     
@@ -283,7 +322,7 @@ struct CallView: View {
                 .cornerRadius(10)
                 .padding(screenWidth/10/3)
                 .padding(.top, screenWidth/10/2)
-            Text("to-do checklist")
+            Text(checklistTitle)
                 .font(.custom("Biryani", size: 20))
                 .padding(.bottom, 6*screenHeight/40)
                 .foregroundColor(Color("aRed"))
@@ -291,7 +330,7 @@ struct CallView: View {
             VStack {
                 ScrollView(.vertical) {
                     VStack(alignment: .leading) {
-                        ForEach($items) { $item in
+                        ForEach($callModel.checklist) { $item in
                             ScrollView(.horizontal) {
                                 HStack {
                                     Button(action: { item.isChecked.toggle() }) {
@@ -313,7 +352,7 @@ struct CallView: View {
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                     Button("Add") {
                         if !newItemText.isEmpty {
-                            items.append(ChecklistItem(text: newItemText, isChecked: false))
+                            callModel.checklist.append(ChecklistItem(text: newItemText, isChecked: false))
                             newItemText = ""
                         }
                     }
@@ -331,6 +370,12 @@ struct CallView: View {
         .frame(width: 9*screenWidth/11, height: screenHeight/5)
     }
     
+    /// Shows how your friend is doing on their own list, e.g. "to-do · Sam 2/5".
+    private var checklistTitle: String {
+        guard let progress = callModel.friendProgress, progress.total > 0 else { return "to-do checklist" }
+        return "to-do · \(callModel.friendName) \(progress.done)/\(progress.total)"
+    }
+
     var footerView: some View {
         HStack(spacing:screenWidth/22) {
             Rectangle()
@@ -343,7 +388,7 @@ struct CallView: View {
                 .frame(width:3*screenWidth/7, height:screenHeight/22)
                 .background(Color("aRed"))
                 .onTapGesture {
-                    contactModel.nextScreen = .photo
+                    callModel.endBean()
                 }
             Rectangle()
                 .frame(width:screenWidth/7, height:screenHeight/22)
@@ -353,5 +398,5 @@ struct CallView: View {
     }
 }
 #Preview {
-    CallView(callModel: CallViewModel(), contactModel: ContactViewModel(), timeRemaining: 25)
+    CallView(callModel: CallViewModel())
 }

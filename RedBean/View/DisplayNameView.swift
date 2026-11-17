@@ -9,6 +9,7 @@ import SwiftUI
 
 struct DisplayNameView: View {
     @State private var displayName: String = ""
+    @State private var phoneNumber: String = ""
     @ObservedObject var viewModel: LoginViewModel
     
     var body: some View {
@@ -42,11 +43,37 @@ struct DisplayNameView: View {
                                 .padding(.horizontal, 20)
                         )
                 }
+
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Phone Number")
+                        .font(.custom("Biryani", size: 20))
+                        .foregroundColor(.white)
+
+                    Rectangle()
+                        .fill(Color("aPink"))
+                        .frame(width: 322, height: 66)
+                        .overlay(
+                            TextField("So friends can find you", text: $phoneNumber)
+                                .keyboardType(.phonePad)
+                                .textContentType(.telephoneNumber)
+                                .font(.custom("Biryani", size: 20))
+                                .foregroundColor(Color("aRed"))
+                                .padding(.horizontal, 20)
+                        )
+                }
+
+                if !viewModel.errorMessage.isEmpty {
+                    Text(viewModel.errorMessage)
+                        .font(.custom("Biryani", size: 15))
+                        .foregroundColor(.white)
+                        .multilineTextAlignment(.center)
+                }
                 
                 Button(action: {
-                    if !displayName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                        viewModel.setDisplayName(displayName.trimmingCharacters(in: .whitespacesAndNewlines))
-                    }
+                    viewModel.completeProfile(
+                        name: displayName.trimmingCharacters(in: .whitespacesAndNewlines),
+                        phone: phoneNumber
+                    )
                 }) {
                     ZStack {
                         Color("aPink")
@@ -58,11 +85,21 @@ struct DisplayNameView: View {
                     }
                     .frame(width: 200, height: 66)
                 }
-                .disabled(displayName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                .opacity(displayName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? 0.6 : 1.0)
+                .disabled(!canContinue)
+                .opacity(canContinue ? 1.0 : 0.6)
             }
             .padding(.horizontal, 40)
         }
+        .onAppear {
+            // Older accounts already have a name; only the phone number is new.
+            displayName = viewModel.displayName
+            phoneNumber = viewModel.phoneNumber
+        }
+    }
+
+    private var canContinue: Bool {
+        !displayName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            && PhoneNumber.normalized(phoneNumber) != nil
     }
 }
 
