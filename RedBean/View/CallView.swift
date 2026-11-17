@@ -12,39 +12,11 @@ import StreamVideoSwiftUI
 struct CallView: View {
 
     @ObservedObject var callModel: CallViewModel
-    @ObservedObject var contactModel : ContactViewModel
     
     let screenWidth = UIScreen.main.bounds.width
     let screenHeight = UIScreen.main.bounds.height
     
-    @State private var workTime: Bool = true
     @State private var usePomodoroOrOtherDefault: Bool = true
-    @State private var timerActive = false
-    
-    @State private var timeRemaining: Int
-
-    init(callModel: CallViewModel, contactModel: ContactViewModel) {
-        self.callModel = callModel
-        self.contactModel = contactModel
-        let schedule = Self.schedule(callModel: callModel, contactModel: contactModel)
-        _timeRemaining = State(initialValue: schedule.workMinutes * 60)
-    }
-
-    /// The schedule picked on the Start a Bean screen (its rows are numbered 1...3).
-    private static func schedule(callModel: CallViewModel, contactModel: ContactViewModel) -> TimerSchedule {
-        let index = (contactModel.selectedSchedule ?? 1) - 1
-        let safeIndex = min(max(index, 0), callModel.builtInSchedules.count - 1)
-        return callModel.builtInSchedules[safeIndex]
-    }
-
-    private var schedule: TimerSchedule {
-        Self.schedule(callModel: callModel, contactModel: contactModel)
-    }
-    
-    @State private var items: [ChecklistItem] = [
-           //ChecklistItem(text: "First task", isChecked: false)
-    ]
-    
     @State private var newItemText: String = ""
     
     var body: some View {
@@ -81,18 +53,19 @@ struct CallView: View {
             }
         }
         .task {
-            if let friend = contactModel.selectedFriend {
-                await callModel.startBean(friendUID: friend.uid)
+            // Ringing calls answered from the iPhone call screen are already joined.
+            if callModel.call == nil {
+                await callModel.startBean()
             }
         }
-        .onDisappear {
-            callModel.leaveCall()
+        .onReceive(Timer.publish(every: 1, on: .main, in: .common).autoconnect()) { _ in
+            callModel.tick()
         }
     }
     
     var headerView: some View {
         HStack(spacing: 70) {
-            Text(contactModel.selectedFriend?.name ?? "Unknown Caller")
+            Text(callModel.friendName)
                 .font(.custom("Jua", size: 30))
                 .foregroundColor(Color("aRed"))
         }
@@ -164,9 +137,9 @@ struct CallView: View {
                     .font(.custom("Biryani", size: 16))
                     .foregroundColor(Color("aRed"))
                     .multilineTextAlignment(.center)
-                if case .failed = callModel.callStatus, let friend = contactModel.selectedFriend {
+                if case .failed = callModel.callStatus {
                     Button("try again") {
-                        Task { await callModel.startBean(friendUID: friend.uid) }
+                        Task { await callModel.startBean() }
                     }
                     .font(.custom("Jua", size: 18))
                     .foregroundStyle(Color("aRed"))
@@ -178,10 +151,10 @@ struct CallView: View {
     }
 
     private var statusText: String {
-        let name = contactModel.selectedFriend?.name ?? "your friend"
+        let name = callModel.friendName
         switch callModel.callStatus {
         case .idle, .connecting: return "connecting..."
-        case .waitingForFriend: return "waiting for \(name) to start a bean with you"
+        case .waitingForFriend: return "calling \(name)..."
         case .inCall: return ""
         case .failed(let message): return "couldn't connect: \(message)"
         }
@@ -252,7 +225,7 @@ struct CallView: View {
                             .cornerRadius(10)
                     )
                     .onTapGesture {
-                        workTime = true;//add smt so its only if a session time is selected AND ALSO MAKE usePomodoro false
+                        callModel.setCustomTimer(isWork: true) // only applies once a session time is selected
                     }
                 
                 Text("break")
@@ -264,7 +237,7 @@ struct CallView: View {
                             .cornerRadius(10)
                     )
                     .onTapGesture {
-                        workTime = false; //only if a session time is selected
+                        callModel.setCustomTimer(isWork: false) // only applies once a session time is selected
                     }
             }
             
@@ -305,21 +278,23 @@ struct CallView: View {
         }
     }
     
+    private var workTime: Bool { callModel.timer.isWork }
+
     var redTimerView : some View {
         VStack {
             ZStack {
                 Circle()
                     .stroke(Color.gray.opacity(0.2), lineWidth: 20)
                 Circle()
-                    .trim(from: 0, to: CGFloat(timeFraction))
+                    .trim(from: 0, to: CGFloat(callModel.timer.fraction(at: callModel.now)))
                     .stroke(workTime ? Color("aRed") : Color.green, style: StrokeStyle(lineWidth: 20, lineCap: .round))
                     .rotationEffect(.degrees(-90))
-                    .animation(.linear, value: timeRemaining)
+                    .animation(.linear, value: callModel.now)
                 VStack {
                     Text(timeString)
                         .font(.custom("Biryani", size: 25))
-                    Button(timerActive ? "pause" : "start") {
-                        timerActive.toggle()
+                    Button(callModel.timer.isRunning ? "pause" : "start") {
+                        callModel.toggleTimer()
                     }
                         .foregroundStyle(Color("aRed"))
                         .font(.custom("Jua", size: 18))
@@ -327,35 +302,12 @@ struct CallView: View {
                 
             }
             .frame(width: screenWidth/4, height: screenWidth/4)
-
-            if !timerActive && timeRemaining == 0 {
-                //sound
-            }
         }
-        .onReceive(Timer.publish(every: 1, on: .main, in: .common).autoconnect()) { _ in
-            guard timerActive, timeRemaining > 0 else { return }
-            timeRemaining -= 1
-            if timeRemaining == 0 {
-                timerActive = false
-                if usePomodoroOrOtherDefault {
-                    // Switch between work and break
-                    workTime.toggle()
-                    timeRemaining = (workTime ? schedule.workMinutes : schedule.breakMinutes) * 60
-                    timerActive = true
-                }
-            }
-        }
-    }
-    
-    private var timeFraction: Double {
-        let total = (workTime ? schedule.workMinutes : schedule.breakMinutes) * 60
-        return total == 0 ? 0 : Double(timeRemaining) / Double(total)
     }
 
     private var timeString: String {
-        let minutes = timeRemaining / 60
-        let seconds = timeRemaining % 60
-        return String(format: "%02d:%02d", minutes, seconds)
+        let remaining = callModel.timer.remaining(at: callModel.now)
+        return String(format: "%02d:%02d", remaining / 60, remaining % 60)
     }
     
     
@@ -370,7 +322,7 @@ struct CallView: View {
                 .cornerRadius(10)
                 .padding(screenWidth/10/3)
                 .padding(.top, screenWidth/10/2)
-            Text("to-do checklist")
+            Text(checklistTitle)
                 .font(.custom("Biryani", size: 20))
                 .padding(.bottom, 6*screenHeight/40)
                 .foregroundColor(Color("aRed"))
@@ -378,7 +330,7 @@ struct CallView: View {
             VStack {
                 ScrollView(.vertical) {
                     VStack(alignment: .leading) {
-                        ForEach($items) { $item in
+                        ForEach($callModel.checklist) { $item in
                             ScrollView(.horizontal) {
                                 HStack {
                                     Button(action: { item.isChecked.toggle() }) {
@@ -400,7 +352,7 @@ struct CallView: View {
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                     Button("Add") {
                         if !newItemText.isEmpty {
-                            items.append(ChecklistItem(text: newItemText, isChecked: false))
+                            callModel.checklist.append(ChecklistItem(text: newItemText, isChecked: false))
                             newItemText = ""
                         }
                     }
@@ -418,6 +370,12 @@ struct CallView: View {
         .frame(width: 9*screenWidth/11, height: screenHeight/5)
     }
     
+    /// Shows how your friend is doing on their own list, e.g. "to-do · Sam 2/5".
+    private var checklistTitle: String {
+        guard let progress = callModel.friendProgress, progress.total > 0 else { return "to-do checklist" }
+        return "to-do · \(callModel.friendName) \(progress.done)/\(progress.total)"
+    }
+
     var footerView: some View {
         HStack(spacing:screenWidth/22) {
             Rectangle()
@@ -440,5 +398,5 @@ struct CallView: View {
     }
 }
 #Preview {
-    CallView(callModel: CallViewModel(), contactModel: ContactViewModel())
+    CallView(callModel: CallViewModel())
 }
