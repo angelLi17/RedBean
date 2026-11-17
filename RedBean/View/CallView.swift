@@ -6,6 +6,8 @@
 //
 
 import SwiftUI
+import StreamVideo
+import StreamVideoSwiftUI
 
 struct CallView: View {
 
@@ -19,7 +21,25 @@ struct CallView: View {
     @State private var usePomodoroOrOtherDefault: Bool = true
     @State private var timerActive = false
     
-    @State var timeRemaining: Int
+    @State private var timeRemaining: Int
+
+    init(callModel: CallViewModel, contactModel: ContactViewModel) {
+        self.callModel = callModel
+        self.contactModel = contactModel
+        let schedule = Self.schedule(callModel: callModel, contactModel: contactModel)
+        _timeRemaining = State(initialValue: schedule.workMinutes * 60)
+    }
+
+    /// The schedule picked on the Start a Bean screen (its rows are numbered 1...3).
+    private static func schedule(callModel: CallViewModel, contactModel: ContactViewModel) -> TimerSchedule {
+        let index = (contactModel.selectedSchedule ?? 1) - 1
+        let safeIndex = min(max(index, 0), callModel.builtInSchedules.count - 1)
+        return callModel.builtInSchedules[safeIndex]
+    }
+
+    private var schedule: TimerSchedule {
+        Self.schedule(callModel: callModel, contactModel: contactModel)
+    }
     
     @State private var items: [ChecklistItem] = [
            //ChecklistItem(text: "First task", isChecked: false)
@@ -60,11 +80,19 @@ struct CallView: View {
 
             }
         }
+        .task {
+            if let friend = contactModel.selectedFriend {
+                await callModel.startBean(friendUID: friend.uid)
+            }
+        }
+        .onDisappear {
+            callModel.leaveCall()
+        }
     }
     
     var headerView: some View {
         HStack(spacing: 70) {
-            Text(contactModel.selectedContactID ?? "Unknown Caller")
+            Text(contactModel.selectedFriend?.name ?? "Unknown Caller")
                 .font(.custom("Jua", size: 30))
                 .foregroundColor(Color("aRed"))
         }
@@ -84,40 +112,99 @@ struct CallView: View {
                 .shadow(
                     color: Color(red: 0, green: 0, blue: 0, opacity: 0.3), radius: 4, y: 4
                 )
-            Color(.white)
-                .cornerRadius(10)
-                .padding(screenWidth/10/3)
-                .padding(.top, screenWidth/10/2)
-            Text("choose a friend to call")
-                .font(.custom("Biryani", size: 20))
-                .padding(.bottom, 6*screenHeight/30)
-                .foregroundColor(Color("aRed"))
-            
-            List(contactModel.contacts, id: \.identifier) { contact in
-                Text("\(contact.givenName) \(contact.familyName)")
-                    .font(.headline)
-                    .padding(.vertical, 8)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(
-                        contactModel.selectedContactID == contact.identifier
-                        ? Color.gray.opacity(0.3)
-                        : Color.clear
-                    )
-                    .contentShape(Rectangle()) // Makes the whole row tappable
-                    .onTapGesture {
-                        contactModel.selectedContactID = contact.identifier
-                        // Do something else on tap if needed
+            GeometryReader { geo in
+                ZStack {
+                    remoteVideo(size: geo.size)
+
+                    if let me = callModel.localParticipant {
+                        VideoCallParticipantView(
+                            viewFactory: DefaultViewFactory.shared,
+                            participant: me,
+                            id: "\(me.id)-local",
+                            availableFrame: CGRect(x: 0, y: 0, width: geo.size.width / 3.5, height: geo.size.height / 2),
+                            contentMode: .scaleAspectFill,
+                            customData: ["videoOn": .bool(callModel.cameraOn)],
+                            call: callModel.call
+                        )
+                        .frame(width: geo.size.width / 3.5, height: geo.size.height / 2)
+                        .cornerRadius(8)
+                        .clipped()
+                        .padding(6)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+                    }
+
+                    callControls
+                        .padding(6)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
                 }
             }
+            .background(Color.white)
             .cornerRadius(10)
-            .padding(screenWidth/10/2)
-            .padding(.top, screenWidth/10/3)
-            .font(.custom("Biryani", size: 15))
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .listStyle(.plain)
-            .foregroundColor(Color("aRed"))
+            .clipped()
+            .padding(screenWidth/10/3)
         }
         .frame(width: 9*screenWidth/11, height: screenHeight/4)
+    }
+
+    @ViewBuilder
+    private func remoteVideo(size: CGSize) -> some View {
+        if let friend = callModel.remoteParticipant {
+            VideoCallParticipantView(
+                viewFactory: DefaultViewFactory.shared,
+                participant: friend,
+                availableFrame: CGRect(origin: .zero, size: size),
+                contentMode: .scaleAspectFill,
+                customData: [:],
+                call: callModel.call
+            )
+            .frame(width: size.width, height: size.height)
+        } else {
+            VStack(spacing: 8) {
+                Text(statusText)
+                    .font(.custom("Biryani", size: 16))
+                    .foregroundColor(Color("aRed"))
+                    .multilineTextAlignment(.center)
+                if case .failed = callModel.callStatus, let friend = contactModel.selectedFriend {
+                    Button("try again") {
+                        Task { await callModel.startBean(friendUID: friend.uid) }
+                    }
+                    .font(.custom("Jua", size: 18))
+                    .foregroundStyle(Color("aRed"))
+                }
+            }
+            .padding()
+            .frame(width: size.width, height: size.height)
+        }
+    }
+
+    private var statusText: String {
+        let name = contactModel.selectedFriend?.name ?? "your friend"
+        switch callModel.callStatus {
+        case .idle, .connecting: return "connecting..."
+        case .waitingForFriend: return "waiting for \(name) to start a bean with you"
+        case .inCall: return ""
+        case .failed(let message): return "couldn't connect: \(message)"
+        }
+    }
+
+    private var callControls: some View {
+        HStack(spacing: 10) {
+            controlButton(callModel.micOn ? "mic.fill" : "mic.slash.fill", action: callModel.toggleMic)
+            controlButton(callModel.cameraOn ? "video.fill" : "video.slash.fill", action: callModel.toggleCamera)
+            controlButton("arrow.triangle.2.circlepath.camera", action: callModel.flipCamera)
+        }
+        .opacity(callModel.call == nil ? 0 : 1)
+    }
+
+    private func controlButton(_ systemName: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: systemName)
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundColor(.white)
+                .frame(width: 32, height: 32)
+                .background(Color("aRed").opacity(0.85))
+                .clipShape(Circle())
+        }
     }
 
     var timerView: some View {
@@ -253,7 +340,7 @@ struct CallView: View {
                 if usePomodoroOrOtherDefault {
                     // Switch between work and break
                     workTime.toggle()
-                    timeRemaining = (workTime ? callModel.builtInSchedules[contactModel.selectedSchedule ?? 0].workMinutes : callModel.builtInSchedules[contactModel.selectedSchedule ?? 0].breakMinutes) * 60
+                    timeRemaining = (workTime ? schedule.workMinutes : schedule.breakMinutes) * 60
                     timerActive = true
                 }
             }
@@ -261,7 +348,7 @@ struct CallView: View {
     }
     
     private var timeFraction: Double {
-        let total = (workTime ? callModel.builtInSchedules[contactModel.selectedSchedule ?? 0].workMinutes : callModel.builtInSchedules[contactModel.selectedSchedule ?? 0].breakMinutes) * 60
+        let total = (workTime ? schedule.workMinutes : schedule.breakMinutes) * 60
         return total == 0 ? 0 : Double(timeRemaining) / Double(total)
     }
 
@@ -343,7 +430,7 @@ struct CallView: View {
                 .frame(width:3*screenWidth/7, height:screenHeight/22)
                 .background(Color("aRed"))
                 .onTapGesture {
-                    contactModel.nextScreen = .photo
+                    callModel.endBean()
                 }
             Rectangle()
                 .frame(width:screenWidth/7, height:screenHeight/22)
@@ -353,5 +440,5 @@ struct CallView: View {
     }
 }
 #Preview {
-    CallView(callModel: CallViewModel(), contactModel: ContactViewModel(), timeRemaining: 25)
+    CallView(callModel: CallViewModel(), contactModel: ContactViewModel())
 }

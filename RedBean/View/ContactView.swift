@@ -83,29 +83,43 @@ struct ContactView: View {
                 .font(.custom("Biryani", size: 20))
                 .padding(.bottom, 6*screenHeight/40)
                 .foregroundColor(Color("aRed"))
-            
+
             contactViewHelper
         }
         .frame(width: 9*screenWidth/11, height: screenHeight/5)
+        .onAppear {
+            contactModel.requestAccess()
+        }
     }
+
+    /// Only contacts with a RedBean account are listed (matched by phone number).
     var contactViewHelper: some View {
-        List(contactModel.contacts, id: \.identifier) { contact in
-            contactModel.checkIfPhoneNumberRegistered(contact.phoneNumber) { isRegistered, uid in
-                if isRegistered, let uid = uid {
-                    Text("\(contact.givenName) \(contact.familyName)")
-                        .font(.headline)
-                        .padding(.vertical, 8)
+        let friends = contactModel.registeredFriends.filter { $0.uid != homeModel.userID }
+        return Group {
+            if !contactModel.accessGranted {
+                Text("allow Contacts access in Settings to find friends")
+                    .multilineTextAlignment(.center)
+                    .padding(.top, screenWidth/10/2)
+            } else if friends.isEmpty {
+                Text("none of your contacts are on RedBean yet")
+                    .multilineTextAlignment(.center)
+                    .padding(.top, screenWidth/10/2)
+            } else {
+                List(friends) { friend in
+                    Text(friend.name)
+                        .padding(.vertical, 4)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .background(
-                            contactModel.selectedContactID == contact.identifier
-                                        ? Color.gray.opacity(0.3): Color.clear
-                                )
+                            contactModel.selectedContactID == friend.id
+                            ? Color.gray.opacity(0.3)
+                            : Color.clear
+                        )
                         .contentShape(Rectangle()) // Makes the whole row tappable
                         .onTapGesture {
-                            contactModel.selectedContactID = contact.identifier
-                        // Do something else on tap if needed
-                    }
+                            contactModel.selectedContactID = friend.id
+                        }
                 }
+                .listStyle(.plain)
             }
         }
         .cornerRadius(10)
@@ -113,7 +127,6 @@ struct ContactView: View {
         .padding(.top, screenWidth/10/3)
         .font(.custom("Biryani", size: 15))
         .frame(maxWidth: .infinity, alignment: .leading)
-        .listStyle(.plain)
         .foregroundColor(Color("aRed"))
     }
     

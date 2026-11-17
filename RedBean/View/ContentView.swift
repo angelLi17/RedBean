@@ -28,7 +28,7 @@ struct ContentView: View {
                 LoginView(viewModel: viewModel)
                     .onChange(of: viewModel.userID) { oldValue, newValue in
                         if newValue != "" {
-                            if viewModel.displayName.isEmpty {
+                            if viewModel.needsProfileSetup {
                                 currentScreen = .displayName
                             } else {
                                 currentScreen = .home
@@ -39,8 +39,8 @@ struct ContentView: View {
                     }
             case .displayName:
                 DisplayNameView(viewModel: viewModel)
-                    .onChange(of: viewModel.displayName) { oldValue, newValue in
-                        if !newValue.isEmpty {
+                    .onChange(of: viewModel.profileComplete) { oldValue, newValue in
+                        if newValue {
                             currentScreen = .home
                             homeModel.userID = viewModel.userID
                             homeModel.displayName = viewModel.displayName
@@ -66,10 +66,14 @@ struct ContentView: View {
             case .contact:
                 ContactView(homeModel: homeModel, contactModel: contactModel)
                     .onChange(of: contactModel.nextScreen) { oldValue, newValue in
+                        if newValue == .call {
+                            callModel.currentUser = viewModel.appUser
+                            callModel.nextScreen = .call
+                        }
                         currentScreen = contactModel.nextScreen
                     }
             case .call:
-            CallView(callModel: callModel, contactModel: contactModel, timeRemaining: callModel.builtInSchedules[contactModel.selectedSchedule ?? 0].workMinutes)
+                CallView(callModel: callModel, contactModel: contactModel)
                     .onChange(of: callModel.nextScreen) { oldValue, newValue in
                         currentScreen = callModel.nextScreen
                     }

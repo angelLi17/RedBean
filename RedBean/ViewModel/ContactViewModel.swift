@@ -30,10 +30,30 @@ class ContactViewModel: ObservableObject {
     ]
     @Published var registeredContacts: [String: String] = [:] // [contact.identifier: uid]
 
+    struct Friend: Identifiable {
+        let id: String   // contact.identifier
+        let name: String
+        let uid: String  // their Firebase UID
+    }
+
+    /// Contacts who have a RedBean account, sorted by name.
+    var registeredFriends: [Friend] {
+        contacts.compactMap { contact in
+            guard let uid = registeredContacts[contact.identifier] else { return nil }
+            let name = "\(contact.givenName) \(contact.familyName)".trimmingCharacters(in: .whitespaces)
+            return Friend(id: contact.identifier, name: name.isEmpty ? "Friend" : name, uid: uid)
+        }
+        .sorted { $0.name < $1.name }
+    }
+
+    var selectedFriend: Friend? {
+        registeredFriends.first { $0.id == selectedContactID }
+    }
+
     func checkAllContactsRegistration() {
         for contact in contacts {
             for phoneLabel in contact.phoneNumbers {
-                let numberString = phoneLabel.value.stringValue
+                guard let numberString = PhoneNumber.normalized(phoneLabel.value.stringValue) else { continue }
                 checkIfPhoneNumberRegistered(numberString) { isRegistered, uid in
                     DispatchQueue.main.async {
                         if isRegistered, let uid = uid {
@@ -69,6 +89,7 @@ class ContactViewModel: ObservableObject {
                 self.accessGranted = granted
                 if granted {
                     self.contacts = self.fetchContacts()
+                    self.checkAllContactsRegistration()
                 }
             }
         }
